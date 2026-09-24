@@ -1,0 +1,1 @@
+Serif labels on a hairline; the active tab in ink with a 2px gold underline. One row per page; the lanes of a deal.

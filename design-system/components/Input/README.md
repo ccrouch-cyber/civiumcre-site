@@ -1,0 +1,1 @@
+One input style for text and select. Focus turns the border gold with the ring; bad turns it red; busy washes it gold while the server works. The label sits to the left in body, the unit to the right in tiny fade.

@@ -1,0 +1,1 @@
+The one act on a card is a primary button; a second act beside it is a ghost; an inline act is a link; a row's verbs are small. Never two primaries in one card; a disabled button stays visible at 45%. The consumer supplies the words (a verb, in the customer's language).

@@ -1,0 +1,1 @@
+A state word beside the thing it describes: default for a fact, good for READY, warn for with-Civium or refused, gold for the primary, assume for an assumption. The word is the customer's; the reason goes on the next line in tiny, the detail behind a click.

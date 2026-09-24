@@ -1,0 +1,1 @@
+An uppercase label above a card or block; gold for the block that matters on the page. Ten and a half pixels, tracked 1.6px, never a heading.

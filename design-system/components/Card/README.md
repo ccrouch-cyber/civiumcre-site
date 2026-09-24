@@ -1,0 +1,1 @@
+The surface: card on paper with a line border and the whisper shadow; a clickable card lifts on hover. A card holds one idea: an eyebrow, a line saying what happens, the thing.

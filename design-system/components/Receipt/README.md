@@ -1,0 +1,1 @@
+The signature. Hover any number and the card opens: the number, the equation with the numbers in it, the inputs with each one's origin. Click and the chain walks. The product's own component (frontend/src/receipt.jsx) is the design; this is the card at rest as a static rendition. The consumer supplies nothing; the number carries its own lineage.

@@ -1,0 +1,1 @@
+A filter chip; on fills gold. Small pills sit in a desk's filter row.
