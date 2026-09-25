@@ -1,0 +1,18 @@
+<!-- @dsCard group="Components" viewport="700x150" name="Buttons & pills" -->
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:16px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}</style></head><body><div id="root"></div>
+<script type="text/babel">
+const { Button, Pill, Tag, Eyebrow, Card, Input, Tabs, Receipt } = window.CiviumDesignSystem_be8662;
+function Demo(){
+const [f,setF]=React.useState('all');
+return <div style={{display:'grid',gap:12}}>
+<div className="row"><Button>Set password and enter</Button><Button variant="ghost">sign out</Button><Button variant="ink">Confirm</Button><Button disabled>sending…</Button></div>
+<div className="row"><Button variant="ghost" size="sm">re-run</Button><Button size="sm">resolve</Button><Button variant="ghost" size="sm">refuse</Button><Button variant="link">→ open Larkspur Crossing</Button></div>
+<div className="row">{['all','ready','with Civium'].map(x=><Pill key={x} on={f===x} onClick={()=>setF(x)}>{x}</Pill>)}<Pill size="sm" on>escalated</Pill><Pill size="sm">queued</Pill></div>
+</div>;}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+</script></body></html>

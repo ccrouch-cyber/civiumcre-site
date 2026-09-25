@@ -1,0 +1,30 @@
+/* Civium design tokens — copied verbatim from the product's frontend/src/index.css (:root) at main@20c085b. The app's file is the source of truth; edit there, re-sync here. */
+:root {
+  --gold: #b49a5c;
+  --gold-deep: #997f43;
+  --gold-soft: #e8dcbf;
+  --gold-wash: #faf4e3;
+  --ink: #2b2620;
+  --ink-soft: #5d5546;
+  --fade: #8a7f6d;
+  --faint: #cfc6b0;
+  --paper: #f6f1e6;
+  --card: #fffdf8;
+  --wash: #faf6ea;
+  --line: #e4dcc8;
+  --line-soft: #efe8d6;
+  --zebra: #faf6ec;
+  --green: #3f7d3f;
+  --green-wash: #eef3e9;
+  --red: #a33232;
+  --red-wash: #f6e7e7;
+  --amber: #9a7b2d;
+  --orange: #b06226;
+  --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif; /* @kind font */
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; /* @kind font */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+  --shadow-1: 0 1px 2px rgba(43, 38, 32, .05);
+  --shadow-2: 0 5px 16px rgba(43, 38, 32, .10);
+  --ring: 0 0 0 3px rgba(180, 154, 92, .22);
+  --ring-red: 0 0 0 3px rgba(163, 50, 50, .16);
+}

@@ -1,0 +1,9 @@
+html, body { background: var(--paper); color: var(--ink); font: var(--type-body); font-variant-numeric: tabular-nums lining-nums; }
+a { color: var(--gold-deep); text-decoration: none; }
+a:hover { color: var(--ink); }
+.mut { color: var(--fade); }
+.tiny { font: var(--type-tiny); }
+.serif { font-family: var(--serif); }
+.metric { font: var(--type-metric); }
+.pos { color: var(--green); }
+.neg { color: var(--red); }
