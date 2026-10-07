@@ -224,6 +224,7 @@ a:hover { color: var(--ink); }
 .flow-send, .flow-done { display: block; width: 100%; margin-top: 14px; background: var(--gold); color: var(--on-gold); border: 0; font: 15px/1 var(--sans); padding: 15px; border-radius: var(--radius-control); cursor: pointer; }
 .flow-done { margin-top: 20px; }
 .flow-send:hover, .flow-done:hover { background: var(--gold-deep); }
+.flow-send[aria-disabled="true"], .flow-send[aria-disabled="true"]:hover { background: var(--gold); cursor: progress; }
 .flow-refusal { font: 12.5px/1.5 var(--sans); color: var(--red); margin: 12px 0 0; text-align: center; }
 .flow-note { font: 12.5px/1.5 var(--sans); color: var(--fade); margin: 12px 0 0; text-align: center; }
 .flow-eyebrow { font: 10.5px/1 var(--sans); letter-spacing: 1.6px; text-transform: uppercase; }

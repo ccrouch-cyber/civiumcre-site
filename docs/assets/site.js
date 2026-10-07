@@ -119,9 +119,12 @@ const CONFIG = {
       const stops = $$('button, [href], input, select, textarea', panel).filter(el => !el.disabled && el.getClientRects().length);
       if (!stops.length) return;
       const first = stops[0], last = stops[stops.length - 1], at = document.activeElement;
-      const outside = !stops.includes(at);
-      if (e.shiftKey && (at === first || outside)) { e.preventDefault(); last.focus(); }
-      else if (!e.shiftKey && (at === last || (outside && !panel.contains(at)))) { e.preventDefault(); first.focus(); }
+      const before = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);   // a comes before b
+      let to = null;
+      if (!panel.contains(at)) to = e.shiftKey ? last : first;
+      else if (e.shiftKey) { if (at === first || !stops.some(s => before(s, at))) to = last; }
+      else if (at === last || !stops.some(s => before(at, s))) to = first;
+      if (to) { e.preventDefault(); to.focus(); }
     });
 
     // The upload tiles: choose a file or drop one; a drop anywhere else on the overlay does nothing.
@@ -135,8 +138,8 @@ const CONFIG = {
     flow.addEventListener('dragover', e => e.preventDefault());
     flow.addEventListener('drop', e => e.preventDefault());
 
-    // Step 1 sends to the prospect door: multipart email, rent_roll, t12; no cookie. Accepted: step 2 (or, with the
-    // trial off, the modal closes). Refused: the door's own words under the button. Network failure: nothing printed.
+    // Step 1 sends to the prospect door: multipart email, rent_roll, t12; no cookie. Accepted (202): step 2 (or, with
+    // the trial off, the modal closes). Refused: the door's own words under the button. Anything else: nothing printed.
     form.addEventListener('submit', async e => {
       e.preventDefault();
       if (inFlight) return;
@@ -152,7 +155,7 @@ const CONFIG = {
       let accepted = false, words = '';
       try {
         const res = await fetch(CONFIG.PROSPECT_DOOR_URL, { method: 'POST', body, mode: 'cors', credentials: 'omit' });
-        accepted = res.ok;
+        accepted = res.status === 202;
         if (!accepted) {
           const data = await res.json().catch(() => null);
           const said = data && data.detail && data.detail.rejected;
@@ -168,7 +171,7 @@ const CONFIG = {
       if (words) { refusal.textContent = words; refusal.hidden = false; }
     });
 
-    if (location.hash === '#try') openFlow(null);
+    if (location.hash === '#try') openFlow($('.header [data-cta]'));
   }
 
   // The sample page: one <template>, cloned into each slot (the hero stage and The record).
