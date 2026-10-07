@@ -4,23 +4,290 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Civium</title>
-<meta name="description" content="Civium reads a seller's rent roll and T-12 with deterministic code and shows the buyer's team every number with its receipt.">
-<style>
-  :root { --gold:#b49a5c; --gold-deep:#997f43; --ink:#2b2620; --fade:#8a7f6d; --paper:#f6f1e6; --line:#e4dcc8;
-          --serif: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
-          --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
-  html, body { margin:0; background:var(--paper); color:var(--ink); font:15px/1.5 var(--sans); }
-  main { max-width: 720px; margin: 0 auto; padding: 96px 24px; }
-  .brand { font-family: var(--serif); font-size: 32px; letter-spacing: 9px; color: var(--gold); }
-  p { margin: 20px 0 0; }
-  .mut { color: var(--fade); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; margin-top: 40px; }
-</style>
+<meta name="description" content="What the property you’re pitching is worth today and where the upside is, back in minutes. Underwritten the way the buy side does it, with every number traced to its source.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/assets/tokens.css">
+<link rel="stylesheet" href="/assets/system.css">
+<link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
+<div class="site" data-site>
 <main>
-  <div class="brand">CIVIUM</div>
-  <p>Civium reads a seller's rent roll and T-12 with deterministic code and shows the buyer's team every number with its receipt.</p>
-  <p class="mut">The site is being designed. Invitations open soon.</p>
+
+  <!-- 1. Hero (dark), with the header on it -->
+  <section class="hero">
+    <div class="grain" data-grain></div>
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+      <header class="header header--dark">
+        <a class="wordmark" href="/">CIVIUM</a>
+        <nav class="nav">
+          <a class="nav-link" href="#how">How it works</a>
+          <a class="nav-link" href="/pricing/">Pricing</a>
+          <a class="nav-link" href="/faq/">FAQ</a>
+          <a class="btn btn--nav" href="mailto:deals@civiumcre.com" data-cta></a>
+        </nav>
+      </header>
+      <div class="hero-grid">
+        <div data-rise="0">
+          <div class="eyebrow eyebrow--hero">Caden Crouch · Austin, Texas</div>
+          <h1 class="hero-title">Institutional underwriting for Texas multifamily.</h1>
+          <p class="hero-lead">What the property you’re pitching is worth today and where the upside is, back in minutes. Underwritten the way the buy side does it, with every number traced to its source.</p>
+          <div class="hero-actions">
+            <a class="btn btn--hero" href="mailto:deals@civiumcre.com" data-cta></a>
+            <a class="sample-link" href="#value">See a sample page</a>
+          </div>
+          <div class="hero-note">Two files in. No card to start.</div>
+        </div>
+        <div class="stage" data-stage>
+          <div class="layer layer--image">
+            <div class="hero-frame">
+              <div class="hero-img" data-hero-img>
+                <img class="hero-photo" alt="Building render or still" data-hero-photo>
+              </div>
+              <div class="sweep" data-sweep></div>
+              <div class="shade"></div>
+              <div class="grain grain--image" data-grain></div>
+            </div>
+          </div>
+          <div class="layer layer--page">
+            <div class="hero-page" data-hero-page data-sample-slot></div>
+          </div>
+          <div class="layer layer--chip">
+            <div class="chip" data-hero-chip>
+              <div class="mini-eyebrow">Rents vs. comps</div>
+              <div class="chip-value">+$85</div>
+              <div class="chip-note">a unit, a month, under today’s comps</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. What you get -->
+  <section class="value" id="value">
+    <div class="value-grid">
+      <div data-rise="0">
+        <div class="eyebrow">What you get</div>
+        <h2 class="h2">See where the value is before the owner meeting.</h2>
+        <p class="lead">Civium checks every line that moves NOI: rents against today’s comps, insurance, utilities and taxes against what your other deals pay, and the cap rate the market is paying. You see where the value can go and how much it adds.</p>
+      </div>
+      <div class="bridge" data-bridge>
+        <div class="bridge-back"></div>
+        <div class="bridge-card">
+          <div class="bridge-head">
+            <div>
+              <div class="bridge-title">Larkspur Crossing</div>
+              <div class="bridge-sub">96 units · sample deal</div>
+            </div>
+            <button type="button" class="replay" data-replay hidden>Replay</button>
+          </div>
+          <div class="brow" data-brow>
+            <div class="brow-line">
+              <div>
+                <div class="brow-label">Worth today</div>
+                <div class="brow-sub">The seller’s NOI of $652,960 at a 6.50% cap</div>
+              </div>
+              <span class="brow-value" data-count="10045538" data-pre="$">$10,045,538</span>
+            </div>
+            <div class="bar-track"><div class="bar bar--worth" data-bar></div></div>
+          </div>
+          <div class="brow" data-brow>
+            <div class="brow-line">
+              <div>
+                <div class="brow-label">Rents to market</div>
+                <div class="brow-sub">96 units renting $85 a month under the comps</div>
+              </div>
+              <span class="brow-value brow-value--up" data-count="1506462" data-pre="+$">+$1,506,462</span>
+            </div>
+            <div class="bar-track"><div class="bar bar--rents" data-bar></div></div>
+          </div>
+          <div class="brow" data-brow>
+            <div class="brow-line">
+              <div>
+                <div class="brow-label">Insurance to your deals</div>
+                <div class="brow-sub">$250 a unit a year above what your other deals pay</div>
+              </div>
+              <span class="brow-value brow-value--up" data-count="369231" data-pre="+$">+$369,231</span>
+            </div>
+            <div class="bar-track"><div class="bar bar--insurance" data-bar></div></div>
+          </div>
+          <div class="brow brow--total" data-brow>
+            <div class="brow-line">
+              <div>
+                <div class="brow-label">What Civium finds</div>
+                <div class="brow-sub">The number to walk in with</div>
+              </div>
+              <span class="brow-value brow-value--total" data-count="11921231" data-pre="$">$11,921,231</span>
+            </div>
+            <div class="bar-track bar-track--gold"><div class="bar bar--finds" data-bar></div></div>
+          </div>
+          <div class="bridge-foot">Rents come from the comps. Insurance comes from your own deals.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. How it works -->
+  <section class="how" id="how">
+    <div class="how-inner">
+      <div class="how-head" data-rise="0">
+        <div>
+          <div class="eyebrow">How it works</div>
+          <h2 class="h2">Send the files. Civium does the math.</h2>
+        </div>
+        <div class="how-aside">Minutes for most deals. Next day at the latest.</div>
+      </div>
+      <ol class="steps">
+        <li class="step" data-rise="0">
+          <div class="step-top"><span class="step-num">1</span><span class="mini-eyebrow">You</span></div>
+          <p class="step-text">Send the rent roll, T-12, and your model if you have one.</p>
+          <div class="pills">
+            <span class="pill" data-rise="200"><span class="pill-dot"></span>Rent roll</span>
+            <span class="pill" data-rise="320"><span class="pill-dot"></span>T-12</span>
+            <span class="pill" data-rise="440"><span class="pill-dot"></span>Your model</span>
+          </div>
+        </li>
+        <li class="step" data-rise="120">
+          <div class="step-top"><span class="step-num">2</span><span class="mini-eyebrow">Civium</span></div>
+          <p class="step-text">Civium finds the upside.</p>
+          <div class="pills">
+            <span class="pill" data-rise="320"><span class="pill-dot pill-dot--green"></span>Rents vs. comps</span>
+            <span class="pill" data-rise="440"><span class="pill-dot pill-dot--green"></span>Expenses vs. your deals</span>
+            <span class="pill" data-rise="560"><span class="pill-dot"></span>Market cap rate</span>
+          </div>
+        </li>
+        <li class="step" data-rise="240">
+          <div class="step-top"><span class="step-num">3</span><span class="mini-eyebrow">You</span></div>
+          <p class="step-text">Walk in with the upside.</p>
+          <div class="pills">
+            <span class="pill" data-rise="440"><span class="pill-dot"></span>Your model beside Civium’s</span>
+            <span class="pill" data-rise="560"><span class="pill-dot"></span>Every number sourced</span>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 4. The receipt (dark) -->
+  <section class="receipt">
+    <div class="grain" data-grain></div>
+    <div class="receipt-glow"></div>
+    <div class="receipt-grid">
+      <div data-rise="0">
+        <div class="eyebrow eyebrow--receipt">The receipt</div>
+        <h2 class="h2">Every number shows where it came from.</h2>
+        <p class="lead lead--receipt">Tap a number and its source opens, down to the line in the seller’s T-12.</p>
+      </div>
+      <div class="sources" data-sources>
+        <div class="srccard is-on" data-srccard="noi">
+          <div class="mini-eyebrow">Source · T-12 statement</div>
+          <div class="src-title">Larkspur Crossing, trailing 12 months</div>
+          <div class="src-rows">
+            <div class="src-row"><span>Gross potential rent</span><span>1,382,400</span></div>
+            <div class="src-row"><span>Vacancy and loss</span><span>(114,739)</span></div>
+            <div class="src-row"><span>Operating expenses</span><span>(614,701)</span></div>
+            <div class="src-row src-row--key is-on" data-srcrow="noi"><span>Net operating income</span><span>652,960</span></div>
+          </div>
+        </div>
+        <div class="srccard" data-srccard="cap">
+          <div class="mini-eyebrow">Source · Sales comps</div>
+          <div class="src-title">Three garden trades, last 12 months</div>
+          <div class="src-rows">
+            <div class="src-row"><span>Sale 1 · 112 units</span><span>6.35%</span></div>
+            <div class="src-row"><span>Sale 2 · 88 units</span><span>6.55%</span></div>
+            <div class="src-row"><span>Sale 3 · 140 units</span><span>6.60%</span></div>
+            <div class="src-row src-row--key" data-srcrow="cap"><span>Market cap rate, average</span><span>6.50%</span></div>
+          </div>
+        </div>
+        <div class="formula">
+          <div class="mini-eyebrow">Worth today</div>
+          <div class="formula-value"><span>$10,045,538</span></div>
+          <div class="formula-line">
+            <span>=</span>
+            <button type="button" class="srcbtn is-on" data-srcbtn="noi" aria-pressed="true">$652,960</button>
+            <span>÷</span>
+            <button type="button" class="srcbtn" data-srcbtn="cap" aria-pressed="false">6.50%</button>
+          </div>
+          <div class="formula-caption">Net operating income over the market cap rate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. The record -->
+  <section class="record">
+    <div class="record-inner">
+      <div class="eyebrow">The record</div>
+      <h2 class="record-title">$200M of multifamily underwritten on the buy side.</h2>
+      <p class="record-line">Civium underwrites the way buyers do, so the numbers hold up on the other side of the table.</p>
+      <div class="stack" data-tilt>
+        <div class="sheet sheet--back"></div>
+        <div class="sheet sheet--mid"></div>
+        <div class="stack-page" data-sample-slot></div>
+      </div>
+      <div class="record-caption">Larkspur Crossing, a sample deal — invented property, real method.</div>
+    </div>
+  </section>
+
+  <!-- 6. Privacy -->
+  <section class="privacy">
+    <div class="privacy-grid">
+      <h2 class="eyebrow eyebrow--list">Privacy</h2>
+      <div data-rise="0">
+        <h3 class="item-title">Private to your team.</h3>
+        <p class="item-body">A team never sees another team’s deal, file, or that it exists.</p>
+      </div>
+      <div data-rise="120" data-trial>
+        <h3 class="item-title">View-only until you choose.</h3>
+        <p class="item-body">A free preview opens on a private link for <span data-preview-days></span> days. Exporting starts a <span data-trial-days></span>-day free trial.</p>
+      </div>
+    </div>
+  </section>
+
 </main>
+
+<!-- 7. Footer (Home: the Firm cell and the last cell) -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div><div class="cell-label">Name</div><div class="cell-value">Caden Crouch</div></div>
+    <div><div class="cell-label">Firm</div><div class="cell-value">Civium</div></div>
+    <div><div class="cell-label">Based in</div><div class="cell-value">Austin, Texas</div></div>
+    <div><div class="cell-label">Covers</div><div class="cell-value">Texas multifamily</div></div>
+    <div><div class="cell-label">Email</div><a class="cell-email" href="mailto:ccrouch@civiumcre.com">ccrouch@civiumcre.com</a></div>
+    <div class="cell-actions">
+      <a class="btn btn--footer" href="mailto:deals@civiumcre.com" data-cta></a>
+      <a class="footer-link" href="/pricing/">Pricing</a>
+      <a class="footer-link" href="/faq/">FAQ</a>
+    </div>
+  </div>
+</footer>
+</div>
+
+<!-- The sample page: its one source, cloned by site.js into the hero and The record. Its copy is under review. -->
+<template id="sample-page">
+  <div class="sp">
+    <div class="sp-page">
+      <div class="sp-top"><span class="sp-mark">CIVIUM</span><span class="sp-kind">Owner’s page</span></div>
+      <div class="sp-rule"></div>
+      <div class="sp-title">Larkspur Crossing</div>
+      <div class="sp-facts">96 units · 85,920 sf · 91.7% occupied</div>
+      <div class="sp-label">Worth today</div>
+      <div class="sp-worth"><span>$10,045,538</span></div>
+      <div class="sp-basis">at a 6.50% cap on NOI of $652,960</div>
+      <div class="sp-rows">
+        <div class="sp-row"><span>Net operating income</span><span class="sp-num">$652,960</span></div>
+        <div class="sp-row"><span>Market cap rate</span><span class="sp-num">6.50%</span></div>
+        <div class="sp-row"><span>A buyer’s model</span><span class="sp-num">$10,757,719</span></div>
+        <div class="sp-row sp-row--net"><span>The owner nets, before taxes</span><span class="sp-num">$3,642,564</span></div>
+      </div>
+      <div class="sp-fill"></div>
+      <div class="sp-foot"><span>Sample deal · invented property</span><span>Civium · Houston, Texas</span></div>
+    </div>
+  </div>
+</template>
+
+<script src="/assets/site.js"></script>
 </body>
 </html>
