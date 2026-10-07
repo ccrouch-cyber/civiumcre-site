@@ -1,0 +1,2 @@
+/* System fonts only — the app ships no webfont files. These rules resolve the stack's named families to the reader's installed copies. */
+@font-face { font-family: 'Iowan Old Style'; src: local('Iowan Old Style'), local('IowanOldStyle-Roman'); font-weight: 400; font-style: normal; }
