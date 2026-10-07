@@ -265,6 +265,51 @@
 </footer>
 </div>
 
+<!-- The Try it free flow. site.js offers it only when PROSPECT_DOOR_URL is set; otherwise it is removed and every
+     Try it free is a mailto: link. Steps 2 and 3 follow the trial switch (TRIAL_ON). -->
+<div class="overlay" data-flow hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="flow-title-1">
+    <div class="panel-head">
+      <span class="panel-mark">CIVIUM</span>
+      <button type="button" class="panel-close" data-flow-close>Close</button>
+    </div>
+    <form class="flow-step" data-step="1" novalidate>
+      <h2 class="flow-title" id="flow-title-1" tabindex="-1" data-cta-label></h2>
+      <p class="flow-text">Send the rent roll and T-12 on a property you’re pitching. Civium’s underwriting comes back on a private link in minutes, next day at the latest.</p>
+      <div class="tiles">
+        <button type="button" class="tile" data-tile="rent_roll"><span class="tile-name">Rent roll</span><span class="tile-file">Drop or choose a file</span></button>
+        <button type="button" class="tile" data-tile="t12"><span class="tile-name">T-12</span><span class="tile-file">Drop or choose a file</span></button>
+      </div>
+      <input type="file" data-file="rent_roll" hidden>
+      <input type="file" data-file="t12" hidden>
+      <input class="flow-email" type="email" name="email" placeholder="you@brokerage.com" aria-label="Email" autocomplete="email">
+      <button type="submit" class="flow-send">Send for underwriting</button>
+      <p class="flow-refusal" data-flow-refusal role="alert" hidden></p>
+      <p class="flow-note">No card needed.<span data-trial> View-only for <span data-preview-days></span> days.</span></p>
+    </form>
+    <div class="flow-step" data-step="2" data-trial hidden>
+      <div class="flow-eyebrow flow-eyebrow--received">Received</div>
+      <h2 class="flow-title flow-title--next" id="flow-title-2" tabindex="-1">Your underwriting is on its way.</h2>
+      <p class="flow-text">It arrives in minutes, by tomorrow at the latest, at a private, view-only link that stays open for <span data-preview-days></span> days.</p>
+      <div class="flow-box">
+        <div class="flow-box-title">Want to export it?</div>
+        <p class="flow-box-text">Add a card to start a <span data-trial-days></span>-day free trial. Cancel anytime before it ends.</p>
+        <!-- "Add a card" (step 2 to 3) is not rendered until a payment door is configured. -->
+      </div>
+    </div>
+    <div class="flow-step" data-step="3" data-trial hidden>
+      <div class="flow-eyebrow flow-eyebrow--member">Member · <span data-trial-days></span>-day trial</div>
+      <h2 class="flow-title flow-title--next" id="flow-title-3" tabindex="-1">You’re in.</h2>
+      <ul class="perks">
+        <li>Export any deal</li>
+        <li>One customization to your workspace each month</li>
+        <li>A standing monthly meeting with Caden, and a booking link if the time doesn’t work</li>
+      </ul>
+      <button type="button" class="flow-done" data-flow-close>Done</button>
+    </div>
+  </div>
+</div>
+
 <!-- The sample page: its one source, cloned by site.js into the hero and The record. Its copy is under review. -->
 <template id="sample-page">
   <div class="sp">

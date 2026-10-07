@@ -206,6 +206,36 @@ a:hover { color: var(--ink); }
 .sp-fill { flex: 1; }
 .sp-foot { display: flex; justify-content: space-between; gap: 3cqw; font: 2.2cqw/1.4 var(--sans); color: var(--fade); border-top: 1px solid var(--line-soft); padding-top: 2.4cqw; }
 
+/* The Try it free flow (Home): overlay, panel, steps 1-3 */
+.overlay { position: fixed; inset: 0; z-index: 50; background: var(--overlay); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.panel { width: min(100%,480px); max-height: calc(100vh - 40px); overflow: auto; box-sizing: border-box; background: var(--card); color: var(--ink); border-radius: 16px; box-shadow: var(--shadow-panel); padding: 32px; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.panel-mark { font: 400 15px/1 var(--serif); letter-spacing: 5px; color: var(--gold); }
+.panel-close { background: none; border: 0; font: 13px/1 var(--sans); color: var(--fade); cursor: pointer; padding: 6px; }
+.flow-title { font: 400 30px/1.15 var(--serif); margin: 0; }
+.flow-title--next { font-size: 28px; margin-top: 10px; }
+.flow-text { font: 15px/1.6 var(--sans); color: var(--ink-soft); margin: 12px 0 0; }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+.tile { text-align: left; background: var(--wash); border: 1px dashed var(--faint); border-radius: 10px; padding: 18px 16px; cursor: pointer; color: var(--ink); }
+.tile.is-on { background: var(--gold-wash); border-color: var(--gold); }
+.tile-name { display: block; font: 400 17px/1.2 var(--serif); }
+.tile-file { display: block; font: 12px/1.4 var(--sans); color: var(--fade); margin-top: 6px; overflow-wrap: anywhere; }
+.flow-email { display: block; width: 100%; box-sizing: border-box; margin-top: 12px; border: 1px solid var(--line); border-radius: var(--radius-control); padding: 13px 14px; font: 14px/1 var(--sans); background: var(--card); color: var(--ink); }
+.flow-send, .flow-done { display: block; width: 100%; margin-top: 14px; background: var(--gold); color: var(--on-gold); border: 0; font: 15px/1 var(--sans); padding: 15px; border-radius: var(--radius-control); cursor: pointer; }
+.flow-done { margin-top: 20px; }
+.flow-send:hover, .flow-done:hover { background: var(--gold-deep); }
+.flow-refusal { font: 12.5px/1.5 var(--sans); color: var(--red); margin: 12px 0 0; text-align: center; }
+.flow-note { font: 12.5px/1.5 var(--sans); color: var(--fade); margin: 12px 0 0; text-align: center; }
+.flow-eyebrow { font: 10.5px/1 var(--sans); letter-spacing: 1.6px; text-transform: uppercase; }
+.flow-eyebrow--received { color: var(--green); }
+.flow-eyebrow--member { color: var(--gold-deep); }
+.flow-box { background: var(--wash); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 22px; }
+.flow-box-title { font: 400 19px/1.3 var(--serif); }
+.flow-box-text { font: 14px/1.6 var(--sans); color: var(--ink-soft); margin: 8px 0 0; }
+.perks { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; font: 14.5px/1.5 var(--sans); color: var(--ink-soft); }
+.perks li { padding: 12px 0; border-top: 1px solid var(--line-soft); }
+.perks li:last-child { border-bottom: 1px solid var(--line-soft); }
+
 /* Pricing, FAQ and 404: the paper pages (header and section share one container) */
 .page { max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px,4cqw,64px); }
 .page-section { padding: clamp(56px,7cqw,112px) 0 clamp(64px,8cqw,128px); }

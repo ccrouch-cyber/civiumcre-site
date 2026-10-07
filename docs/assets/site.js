@@ -7,9 +7,10 @@ const CONFIG = {
   HERO_IMAGE: ''                // Caden's photo or render; '' = the dark fill
 };
 
-// civiumcre.com — the site's one script. Above: Caden's switches. Below: the copy they print, the sample page,
-// the grain, the receipt cards, the pricing toggle and the motion of design_handoff_site/README.md
-// ("Interactions and motion"); with prefers-reduced-motion set, no motion runs and the final state shows.
+// civiumcre.com — the site's one script. Above: Caden's switches. Below: the copy they print, the trial switch,
+// Sign in, Try it free (the modal and the door, or the mailto: off state), the sample page, the grain, the receipt
+// cards, the pricing toggle and the motion of design_handoff_site/README.md ("Interactions and motion"); with
+// prefers-reduced-motion set, no motion runs and the final state shows.
 (() => {
   'use strict';
   const $ = (sel, el = document) => el.querySelector(sel);
@@ -18,9 +19,157 @@ const CONFIG = {
   const ease = 'cubic-bezier(.2,.7,.2,1)';
 
   // The copy the configuration prints.
-  $$('[data-cta]').forEach(el => { el.textContent = CONFIG.CTA_LABEL; });
+  $$('[data-cta], [data-cta-label]').forEach(el => { el.textContent = CONFIG.CTA_LABEL; });
   $$('[data-preview-days]').forEach(el => { el.textContent = String(CONFIG.PREVIEW_DAYS); });
   $$('[data-trial-days]').forEach(el => { el.textContent = String(CONFIG.TRIAL_DAYS); });
+
+  // The trial switch: with TRIAL_ON false, Privacy item 2, the modal's steps 2 and 3, and the "View-only for N days."
+  // half of step 1's note are not rendered, so the note reads "No card needed."
+  if (!CONFIG.TRIAL_ON) $$('[data-trial]').forEach(el => el.remove());
+
+  // Sign in: the nav's own link style, before the primary button, only when SIGN_IN_URL is set.
+  if (CONFIG.SIGN_IN_URL) $$('.header .nav').forEach(nav => {
+    const a = document.createElement('a');
+    a.className = 'nav-link';
+    a.href = CONFIG.SIGN_IN_URL;
+    a.textContent = 'Sign in';
+    nav.insertBefore(a, $('[data-cta]', nav));
+  });
+
+  // Try it free. Off (PROSPECT_DOOR_URL empty): the HTML's mailto: links stay, same label and look, and the modal is
+  // removed. On: Home's controls open the modal; Pricing, FAQ and 404 link to /#try, which opens it on Home.
+  const flow = $('[data-flow]');
+  if (!CONFIG.PROSPECT_DOOR_URL) {
+    if (flow) flow.remove();
+  } else if (!flow) {
+    $$('[data-cta]').forEach(a => { a.href = '/#try'; });
+  } else {
+    const site = $('[data-site]');
+    const panel = $('[role="dialog"]', flow);
+    const form = $('form', flow);
+    const email = $('input[type="email"]', flow);
+    const send = $('button[type="submit"]', flow);
+    const refusal = $('[data-flow-refusal]', flow);
+    const tiles = $$('[data-tile]', flow);
+    const emptyText = $('.tile-file', tiles[0]).textContent;
+    const files = {};
+    let opener = null;
+    let request = 0;     // bumped on every reset and send; a reply for an older number is ignored
+    let inFlight = 0;
+
+    const show = n => {
+      $$('[data-step]', flow).forEach(step => { step.hidden = step.dataset.step !== String(n); });
+      const title = $('[data-step="' + n + '"] .flow-title', flow);
+      panel.setAttribute('aria-labelledby', title.id);
+      title.focus();
+    };
+    const setFile = (key, file) => {
+      files[key] = file || null;
+      const tile = tiles.find(t => t.dataset.tile === key);
+      tile.classList.toggle('is-on', !!file);
+      $('.tile-file', tile).textContent = file ? file.name + ' attached' : emptyText;
+    };
+    const reset = () => {   // "Closing the modal resets the attached files."
+      request++;
+      inFlight = 0;
+      send.removeAttribute('aria-disabled');
+      tiles.forEach(t => setFile(t.dataset.tile, null));
+      $$('input', flow).forEach(i => { i.value = ''; });
+      refusal.hidden = true;
+      refusal.textContent = '';
+    };
+    const openFlow = from => {
+      opener = from || null;
+      reset();
+      flow.hidden = false;
+      site.inert = true;
+      show(1);
+    };
+    const closeFlow = () => {
+      if (flow.hidden) return;
+      flow.hidden = true;
+      site.inert = false;
+      reset();
+      if (location.hash === '#try') history.replaceState(null, '', location.pathname + location.search);
+      if (opener && opener.isConnected) opener.focus();
+      opener = null;
+    };
+
+    // The controls become buttons that open the modal.
+    $$('[data-cta]').forEach(a => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = a.className;
+      b.dataset.cta = '';
+      b.textContent = a.textContent;
+      b.setAttribute('aria-haspopup', 'dialog');
+      b.addEventListener('click', () => openFlow(b));
+      a.replaceWith(b);
+    });
+
+    // Close: the Close and Done buttons, Escape, and a click outside the panel. Tab stays inside the panel.
+    $$('[data-flow-close]', flow).forEach(b => b.addEventListener('click', closeFlow));
+    let downOutside = false;
+    flow.addEventListener('mousedown', e => { downOutside = e.target === flow; });
+    flow.addEventListener('click', e => { if (e.target === flow && downOutside) closeFlow(); });
+    document.addEventListener('keydown', e => {
+      if (flow.hidden) return;
+      if (e.key === 'Escape') { e.preventDefault(); closeFlow(); return; }
+      if (e.key !== 'Tab') return;
+      const stops = $$('button, [href], input, select, textarea', panel).filter(el => !el.disabled && el.getClientRects().length);
+      if (!stops.length) return;
+      const first = stops[0], last = stops[stops.length - 1], at = document.activeElement;
+      const outside = !stops.includes(at);
+      if (e.shiftKey && (at === first || outside)) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (at === last || (outside && !panel.contains(at)))) { e.preventDefault(); first.focus(); }
+    });
+
+    // The upload tiles: choose a file or drop one; a drop anywhere else on the overlay does nothing.
+    tiles.forEach(tile => {
+      const key = tile.dataset.tile;
+      const input = $('input[data-file="' + key + '"]', flow);
+      tile.addEventListener('click', () => input.click());
+      input.addEventListener('change', () => setFile(key, input.files[0]));
+      tile.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) setFile(key, f); });
+    });
+    flow.addEventListener('dragover', e => e.preventDefault());
+    flow.addEventListener('drop', e => e.preventDefault());
+
+    // Step 1 sends to the prospect door: multipart email, rent_roll, t12; no cookie. Accepted: step 2 (or, with the
+    // trial off, the modal closes). Refused: the door's own words under the button. Network failure: nothing printed.
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (inFlight) return;
+      const mine = ++request;
+      inFlight = mine;
+      send.setAttribute('aria-disabled', 'true');
+      refusal.hidden = true;
+      refusal.textContent = '';
+      const body = new FormData();
+      body.append('email', email.value.trim());
+      if (files.rent_roll) body.append('rent_roll', files.rent_roll);
+      if (files.t12) body.append('t12', files.t12);
+      let accepted = false, words = '';
+      try {
+        const res = await fetch(CONFIG.PROSPECT_DOOR_URL, { method: 'POST', body, mode: 'cors', credentials: 'omit' });
+        accepted = res.ok;
+        if (!accepted) {
+          const data = await res.json().catch(() => null);
+          const said = data && data.detail && data.detail.rejected;
+          if (typeof said === 'string') words = said;
+        }
+      } catch (err) {
+        // The network failed: print nothing; the button works again.
+      }
+      if (mine !== request) return;   // closed or reset while the door answered
+      inFlight = 0;
+      send.removeAttribute('aria-disabled');
+      if (accepted) { if (CONFIG.TRIAL_ON) show(2); else closeFlow(); return; }
+      if (words) { refusal.textContent = words; refusal.hidden = false; }
+    });
+
+    if (location.hash === '#try') openFlow(null);
+  }
 
   // The sample page: one <template>, cloned into each slot (the hero stage and The record).
   const sample = $('#sample-page');
