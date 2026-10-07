@@ -90,7 +90,6 @@ const CONFIG = {
       flow.hidden = true;
       site.inert = false;
       reset();
-      if (location.hash === '#try') history.replaceState(null, '', location.pathname + location.search);
       if (opener && opener.isConnected) opener.focus();
       opener = null;
     };
@@ -107,7 +106,7 @@ const CONFIG = {
       a.replaceWith(b);
     });
 
-    // Close: the Close and Done buttons, Escape, and a click outside the panel. Tab stays inside the panel.
+    // Close: the Close and Done buttons, Escape, and a click outside the panel. Tab and Shift+Tab cycle inside it.
     $$('[data-flow-close]', flow).forEach(b => b.addEventListener('click', closeFlow));
     let downOutside = false;
     flow.addEventListener('mousedown', e => { downOutside = e.target === flow; });
@@ -118,13 +117,17 @@ const CONFIG = {
       if (e.key !== 'Tab') return;
       const stops = $$('button, [href], input, select, textarea', panel).filter(el => !el.disabled && el.getClientRects().length);
       if (!stops.length) return;
-      const first = stops[0], last = stops[stops.length - 1], at = document.activeElement;
-      const before = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);   // a comes before b
-      let to = null;
-      if (!panel.contains(at)) to = e.shiftKey ? last : first;
-      else if (e.shiftKey) { if (at === first || !stops.some(s => before(s, at))) to = last; }
-      else if (at === last || !stops.some(s => before(at, s))) to = first;
-      if (to) { e.preventDefault(); to.focus(); }
+      e.preventDefault();
+      const at = document.activeElement, n = stops.length, i = stops.indexOf(at);
+      let to;
+      if (i !== -1) to = stops[(i + (e.shiftKey ? n - 1 : 1)) % n];
+      else if (!panel.contains(at)) to = e.shiftKey ? stops[n - 1] : stops[0];
+      else {   // on a step title: the next stop after it, or the one before it, wrapping
+        const ahead = stops.filter(s => at.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_FOLLOWING);
+        const behind = stops.filter(s => at.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_PRECEDING);
+        to = e.shiftKey ? (behind.length ? behind[behind.length - 1] : stops[n - 1]) : (ahead.length ? ahead[0] : stops[0]);
+      }
+      to.focus();
     });
 
     // The upload tiles: choose a file or drop one; a drop anywhere else on the overlay does nothing.
@@ -139,7 +142,7 @@ const CONFIG = {
     flow.addEventListener('drop', e => e.preventDefault());
 
     // Step 1 sends to the prospect door: multipart email, rent_roll, t12; no cookie. Accepted (202): step 2 (or, with
-    // the trial off, the modal closes). Refused: the door's own words under the button. Anything else: nothing printed.
+    // the trial off, the modal closes). Refused (4xx): the door's own words under the button. Else: nothing printed.
     form.addEventListener('submit', async e => {
       e.preventDefault();
       if (inFlight) return;
@@ -156,7 +159,7 @@ const CONFIG = {
       try {
         const res = await fetch(CONFIG.PROSPECT_DOOR_URL, { method: 'POST', body, mode: 'cors', credentials: 'omit' });
         accepted = res.status === 202;
-        if (!accepted) {
+        if (res.status >= 400 && res.status < 500) {
           const data = await res.json().catch(() => null);
           const said = data && data.detail && data.detail.rejected;
           if (typeof said === 'string') words = said;
@@ -171,7 +174,10 @@ const CONFIG = {
       if (words) { refusal.textContent = words; refusal.hidden = false; }
     });
 
-    if (location.hash === '#try') openFlow($('.header [data-cta]'));
+    if (location.hash === '#try') {   // from Pricing, FAQ or 404: drop the fragment so it cannot pull focus back out
+      history.replaceState(null, '', location.pathname + location.search);
+      openFlow($('.header [data-cta]'));
+    }
   }
 
   // The sample page: one <template>, cloned into each slot (the hero stage and The record).
