@@ -206,6 +206,38 @@ a:hover { color: var(--ink); }
 .sp-fill { flex: 1; }
 .sp-foot { display: flex; justify-content: space-between; gap: 3cqw; font: 2.2cqw/1.4 var(--sans); color: var(--fade); border-top: 1px solid var(--line-soft); padding-top: 2.4cqw; }
 
+/* Pricing, FAQ and 404: the paper pages (header and section share one container) */
+.page { max-width: 1240px; margin: 0 auto; padding: 0 clamp(20px,4cqw,64px); }
+.page-section { padding: clamp(56px,7cqw,112px) 0 clamp(64px,8cqw,128px); }
+.page-title { font: 400 clamp(40px,5cqw,72px)/1.04 var(--serif); letter-spacing: -.015em; margin: 20px 0 0; }
+
+/* Pricing */
+.pricing-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px 40px; margin-bottom: clamp(36px,4cqw,56px); }
+.page-title--pricing { max-width: 14ch; text-wrap: balance; }
+.lead--pricing { max-width: 32em; }
+.toggle { display: inline-flex; gap: 4px; padding: 4px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); }
+.toggle-btn { border: 0; border-radius: 999px; padding: 10px 18px; font: 14px/1 var(--sans); cursor: pointer; background: transparent; color: var(--ink-soft); }
+.toggle-btn[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%,300px), 1fr)); gap: 20px; }
+.plan { display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 32px; box-shadow: var(--shadow-1); }
+.plan--ink { background: var(--ink); color: var(--paper); border: 0; }
+.plan-name { font: 400 26px/1.2 var(--serif); margin: 0; }
+.plan-sub { font: 14px/1.5 var(--sans); color: var(--fade); margin-top: 6px; }
+.plan-price-line { display: flex; align-items: baseline; gap: 10px; margin-top: 36px; }
+.plan-price { font: 400 52px/1 var(--serif); letter-spacing: -.01em; }
+.plan-per { font: 15px/1 var(--sans); color: var(--fade); }
+.plan-alt { font: 13.5px/1.5 var(--sans); color: var(--fade); margin: 10px 0 32px; min-height: 20px; }
+.plan--ink .plan-sub, .plan--ink .plan-alt { color: var(--faint); }
+.plan-btn { margin-top: auto; display: block; text-align: center; background: var(--gold); color: var(--on-gold); font: 15px/1 var(--sans); padding: 15px; border-radius: var(--radius-control); text-decoration: none; }
+.plan-btn:hover { background: var(--gold-deep); color: var(--on-gold); }
+.plan-btn--ghost, .plan-btn--ghost:hover { background: transparent; color: var(--paper); border: 1px solid var(--talk-to-us-border); padding: 14px; }
+.plan-btn--ghost:hover { border-color: var(--gold); }
+.includes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%,280px), 1fr)); gap: 32px clamp(24px,5cqw,80px); margin-top: clamp(56px,7cqw,96px); padding-top: clamp(40px,5cqw,56px); border-top: 1px solid var(--line); }
+.ruled { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; font: 16px/1.5 var(--sans); color: var(--ink-soft); }
+.ruled li { padding: 14px 0; border-top: 1px solid var(--line-soft); }
+.ruled li:last-child { border-bottom: 1px solid var(--line-soft); }
+.item-body--pretty { text-wrap: pretty; }
+
 /* Reduced motion: no transitions; every animation is skipped in site.js and the final state shows */
 @media (prefers-reduced-motion: reduce) {
   .layer, .step, .srccard, .src-row--key, .srcbtn { transition: none; }
