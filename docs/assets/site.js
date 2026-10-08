@@ -186,6 +186,9 @@ const CONFIG = {
       if (files.t12) body.append('t12', files.t12);
       let accepted = false, words = '';
       try {
+        // The door's three traps: a header set by hand, or an upload-progress listener, makes the browser preflight
+        // the post, and the door answers a preflight with a 405; credentials: 'include' hides the door's 202. So this
+        // post sends the form data alone and omits credentials; tools/check_site.sh holds all three.
         const res = await fetch(CONFIG.PROSPECT_DOOR_URL, { method: 'POST', body, mode: 'cors', credentials: 'omit' });
         accepted = res.status === 202;
         if (res.status >= 400 && res.status < 600) {

@@ -13,6 +13,9 @@
 #   5. Exactly one <h1> per page.
 #   6. No host other than civiumcre.com in any text file under docs/ (the SVG and sitemap namespace names excepted),
 #      and no protocol-relative URL.
+#   7. The door's post: exactly one fetch( call in site.js names PROSPECT_DOOR_URL; it carries credentials: 'omit'
+#      and no other credentials, and no headers key; and site.js names no XMLHttpRequest, setRequestHeader,
+#      onprogress or upload.addEventListener anywhere.
 # Exits 1 on any failure. Uses bash 3.2, grep, sed, awk and cmp only.
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -182,6 +185,44 @@ hosts="$(grep -r -I -i -n -o -E 'https?://[^"'"'"'` )<>]+' "$DOCS" \
 relhosts="$(grep -r -I -n -E "([\"'\`(=]|url\([[:space:]]*|^|[[:space:]])//[A-Za-z0-9]" "$DOCS" | sed "s|^$ROOT/||")"
 if [ -z "$hosts$relhosts" ]; then ok "no host other than civiumcre.com under docs/, no protocol-relative URL"
 else bad "outside hosts or protocol-relative URLs:"; printf '%s\n' "$hosts" "$relhosts" | grep -v '^$'; fi
+
+# 7. The door's post. A header set by hand, or an upload-progress listener, makes the browser preflight the post, and
+#    the door answers a preflight with a 405; credentials: 'include' hides the door's 202. A call is read from fetch(
+#    to its closing parenthesis, with // comments removed.
+fetch_calls() {  # stdout: each fetch( call in site.js, on one line
+  sed -E 's#(^|[[:space:]])//.*$#\1#' "$JS" | awk '
+    { src = src " " $0 }
+    END {
+      while (match(src, /[^A-Za-z0-9_$]fetch[ \t]*\(/)) {
+        k = RSTART + RLENGTH - 1; depth = 0; call = ""
+        for (; k <= length(src); k++) {
+          c = substr(src, k, 1); call = call c
+          if (c == "(") depth++
+          else if (c == ")") { depth--; if (depth == 0) break }
+        }
+        print "fetch" call
+        src = substr(src, RSTART + RLENGTH)
+      }
+    }'
+}
+fail_before=$fail
+door="$(fetch_calls | grep -F 'PROSPECT_DOOR_URL')"
+n="$(printf '%s' "$door" | awk 'END { print NR }')"
+if [ "$n" -ne 1 ]; then bad "site.js: $n fetch( calls name PROSPECT_DOOR_URL (exactly one posts to the door)"
+else
+  omit="$(printf '%s\n' "$door" | grep -c -E "credentials[[:space:]]*:[[:space:]]*['\"]omit['\"]")"
+  other="$(printf '%s\n' "$door" | sed -E "s/credentials[[:space:]]*:[[:space:]]*['\"]omit['\"]//g" | grep -c -w credentials)"
+  [ "$omit" = 1 ] && [ "$other" = 0 ] \
+    || bad "site.js: the door's fetch( call must carry credentials: 'omit' and no other credentials (credentials: 'include' hides the door's 202)"
+  printf '%s\n' "$door" | grep -q -w headers \
+    && bad "site.js: the door's fetch( call has a headers key (a header set by hand preflights into the door's 405)"
+fi
+traps="$(grep -n -E 'XMLHttpRequest|setRequestHeader|onprogress|upload\.addEventListener' "$JS")"
+if [ -n "$traps" ]; then
+  bad "site.js names XMLHttpRequest, setRequestHeader, onprogress or upload.addEventListener (the door's post is one fetch; a header set by hand or an upload-progress listener preflights into the door's 405):"
+  printf '%s\n' "$traps"
+fi
+[ "$fail" -eq "$fail_before" ] && ok "site.js posts to the door in one fetch( call: credentials 'omit', no headers key, nothing that preflights"
 
 if [ "$fail" -eq 0 ]; then echo "check_site: green"; else echo "check_site: RED"; fi
 exit $(( fail > 0 ))
