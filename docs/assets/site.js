@@ -58,6 +58,22 @@ const CONFIG = {
     let request = 0;     // bumped on every reset and send; a reply for an older number is ignored
     let inFlight = 0;
 
+    // The door's numbers and words, mirrored from the product (civium_prospect.py, civium_drops.py); the door stays
+    // the authority. A file whose name is not a workbook's, or files past these numbers, are refused here in the
+    // door's own words and never sent: a body declared past the door's number meets a wall a page cannot read.
+    const MIB = 1024 * 1024;
+    const FILE_MAX = 40 * MIB;                 // civium_prospect.FILE_MAX (= civium_drops.SIZE_MAX): one file
+    const BODY_MAX = 85 * MIB;                 // civium_prospect.BODY_MAX: the whole body
+    const EXTS = ['.xlsx', '.xlsm', '.xls'];   // civium_drops.EXTS: a workbook, by the end of its name
+    const WORDS = {                            // civium_prospect.WORDS, verbatim, at those numbers
+      too_large: 'the files are too large — the form takes up to 40 MB a file',
+      not_a_workbook: 'send the rent roll as a workbook (.xlsx, .xlsm or .xls)',
+      not_a_statement: 'send the T-12 as a workbook (.xlsx, .xlsm or .xls)'
+    };
+    const NOT_ITS_KIND = { rent_roll: 'not_a_workbook', t12: 'not_a_statement' };   // civium_prospect.NOT_ITS_KIND
+    // The site's one sentence of its own, for an answer with no words the page can read.
+    const NO_WORDS = 'Civium could not take the files just now — try again in a few minutes.';
+
     const show = n => {
       $$('[data-step]', flow).forEach(step => { step.hidden = step.dataset.step !== String(n); });
       const title = $('[data-step="' + n + '"] .flow-title', flow);
@@ -70,14 +86,14 @@ const CONFIG = {
       tile.classList.toggle('is-on', !!file);
       $('.tile-file', tile).textContent = file ? file.name + ' attached' : emptyText;
     };
+    const say = words => { refusal.textContent = words; refusal.hidden = !words; };   // the line under the button
     const reset = () => {   // "Closing the modal resets the attached files."
       request++;
       inFlight = 0;
       send.removeAttribute('aria-disabled');
       tiles.forEach(t => setFile(t.dataset.tile, null));
       $$('input', flow).forEach(i => { i.value = ''; });
-      refusal.hidden = true;
-      refusal.textContent = '';
+      say('');
     };
     const openFlow = from => {
       opener = from || null;
@@ -131,27 +147,39 @@ const CONFIG = {
       to.focus();
     });
 
-    // The upload tiles: choose a file or drop one; a drop anywhere else on the overlay does nothing.
+    // The upload tiles: choose a file or drop one; a drop anywhere else on the overlay does nothing. A file whose name
+    // does not end in one of EXTS is not attached: the door's words for its part show under the button.
     tiles.forEach(tile => {
       const key = tile.dataset.tile;
       const input = $('input[data-file="' + key + '"]', flow);
+      const choose = file => {
+        const ok = !file || EXTS.some(x => file.name.toLowerCase().endsWith(x));
+        setFile(key, ok ? file : null);
+        say(ok ? '' : WORDS[NOT_ITS_KIND[key]]);
+        if (!ok) input.value = '';   // so the same file chosen again is judged again
+      };
       tile.addEventListener('click', () => input.click());
-      input.addEventListener('change', () => setFile(key, input.files[0]));
-      tile.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) setFile(key, f); });
+      input.addEventListener('change', () => choose(input.files[0]));
+      tile.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) choose(f); });
     });
     flow.addEventListener('dragover', e => e.preventDefault());
     flow.addEventListener('drop', e => e.preventDefault());
 
-    // Step 1 sends to the prospect door: multipart email, rent_roll, t12; no cookie. Accepted (202): step 2 (or, with
-    // the trial off, the modal closes). Refused (4xx): the door's own words under the button. Else: nothing printed.
+    // Step 1 sends to the prospect door: multipart email, rent_roll, t12; no cookie. Files past the door's numbers are
+    // not sent; its too_large words show instead. Accepted (202): step 2 (or, with the trial off, the modal closes).
+    // Any other answer: the door's own words when it carries them (4xx or 5xx), else NO_WORDS. The button works again.
     form.addEventListener('submit', async e => {
       e.preventDefault();
       if (inFlight) return;
+      const chosen = [files.rent_roll, files.t12].filter(Boolean);
+      if (chosen.some(f => f.size > FILE_MAX) || chosen.reduce((sum, f) => sum + f.size, 0) > BODY_MAX) {
+        say(WORDS.too_large);
+        return;
+      }
       const mine = ++request;
       inFlight = mine;
       send.setAttribute('aria-disabled', 'true');
-      refusal.hidden = true;
-      refusal.textContent = '';
+      say('');
       const body = new FormData();
       body.append('email', email.value.trim());
       if (files.rent_roll) body.append('rent_roll', files.rent_roll);
@@ -160,19 +188,19 @@ const CONFIG = {
       try {
         const res = await fetch(CONFIG.PROSPECT_DOOR_URL, { method: 'POST', body, mode: 'cors', credentials: 'omit' });
         accepted = res.status === 202;
-        if (res.status >= 400 && res.status < 500) {
+        if (res.status >= 400 && res.status < 600) {
           const data = await res.json().catch(() => null);
           const said = data && data.detail && data.detail.rejected;
-          if (typeof said === 'string') words = said;
+          if (typeof said === 'string' && said.trim()) words = said;
         }
       } catch (err) {
-        // The network failed: print nothing; the button works again.
+        // No answer the page can read: a blocked one (the wall's 413 carries no allow header) or a failed network.
       }
       if (mine !== request) return;   // closed or reset while the door answered
       inFlight = 0;
       send.removeAttribute('aria-disabled');
       if (accepted) { if (CONFIG.TRIAL_ON) show(2); else closeFlow(); return; }
-      if (words) { refusal.textContent = words; refusal.hidden = false; }
+      say(words || NO_WORDS);   // never a status number, a URL or a stack
     });
 
     if (location.hash === '#try') {   // from Pricing, FAQ or 404: drop the fragment so it cannot pull focus back out

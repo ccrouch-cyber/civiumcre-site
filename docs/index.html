@@ -275,13 +275,13 @@
     </div>
     <form class="flow-step" data-step="1" novalidate>
       <h2 class="flow-title" id="flow-title-1" tabindex="-1" data-cta-label></h2>
-      <p class="flow-text">Send the rent roll and T-12 on a property you’re pitching. Civium’s underwriting comes back on a private link in minutes, next day at the latest.</p>
+      <p class="flow-text">Send the rent roll and T-12 on a property you’re pitching, as Excel workbooks. Civium’s underwriting comes back on a private link in minutes, next day at the latest.</p>
       <div class="tiles">
-        <button type="button" class="tile" data-tile="rent_roll"><span class="tile-name">Rent roll</span><span class="tile-file">Drop or choose a file</span></button>
-        <button type="button" class="tile" data-tile="t12"><span class="tile-name">T-12</span><span class="tile-file">Drop or choose a file</span></button>
+        <button type="button" class="tile" data-tile="rent_roll"><span class="tile-name">Rent roll</span><span class="tile-file">Drop or choose a workbook (.xlsx)</span></button>
+        <button type="button" class="tile" data-tile="t12"><span class="tile-name">T-12</span><span class="tile-file">Drop or choose a workbook (.xlsx)</span></button>
       </div>
-      <input type="file" data-file="rent_roll" hidden>
-      <input type="file" data-file="t12" hidden>
+      <input type="file" data-file="rent_roll" accept=".xlsx,.xlsm,.xls" hidden>
+      <input type="file" data-file="t12" accept=".xlsx,.xlsm,.xls" hidden>
       <input class="flow-email" type="email" name="email" placeholder="you@brokerage.com" aria-label="Email" autocomplete="email">
       <button type="submit" class="flow-send">Send for underwriting</button>
       <p class="flow-refusal" data-flow-refusal role="alert" hidden></p>
