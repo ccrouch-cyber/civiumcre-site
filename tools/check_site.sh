@@ -16,6 +16,7 @@
 #   7. The door's post: exactly one fetch( call in site.js names PROSPECT_DOOR_URL; it carries credentials: 'omit'
 #      and no other credentials, and no headers key; and site.js names no XMLHttpRequest, setRequestHeader,
 #      onprogress or upload.addEventListener anywhere.
+#   8. site.js makes exactly one fetch( call in all; PROSPECT_DOOR_URL has no trailing slash.
 # Exits 1 on any failure. Uses bash 3.2, grep, sed, awk and cmp only.
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -223,6 +224,16 @@ if [ -n "$traps" ]; then
   printf '%s\n' "$traps"
 fi
 [ "$fail" -eq "$fail_before" ] && ok "site.js posts to the door in one fetch( call: credentials 'omit', no headers key, nothing that preflights"
+
+# 8. Two more guards on the door's post: site.js makes exactly one fetch( call in all (a second one could reach the door
+#    through a variable the check cannot see), and PROSPECT_DOOR_URL never ends in "/" (the door answers a trailing slash
+#    with a 307, which a cross-origin post cannot follow into a 202).
+fail_before=$fail
+all_fetches="$(fetch_calls | awk 'END { print NR }')"
+[ "$all_fetches" -eq 1 ] || bad "site.js makes $all_fetches fetch( calls in all (exactly one, the door's)"
+door_url="$(sed -n '5p' "$JS" | sed -E "s/^[^']*'([^']*)'.*/\1/")"
+case "$door_url" in */) bad "PROSPECT_DOOR_URL ends in a slash: $door_url (the door answers a trailing slash with a 307)" ;; esac
+[ "$fail" -eq "$fail_before" ] && ok "site.js makes one fetch( call in all; PROSPECT_DOOR_URL has no trailing slash"
 
 if [ "$fail" -eq 0 ]; then echo "check_site: green"; else echo "check_site: RED"; fi
 exit $(( fail > 0 ))
