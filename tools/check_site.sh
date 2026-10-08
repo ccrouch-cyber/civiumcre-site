@@ -86,7 +86,7 @@ done < <(grep -o -E "\.(href|src)[[:space:]]*=[[:space:]]*$q|setAttribute\([[:sp
          | grep -o -E "$q\$")
 [ "$fail" -eq "$fail_before" ] && ok "$links href/src values resolve under docs/ (pages and site.js; files, #ids, mailto:, data:)"
 
-# 3. The configuration block: the first eight lines, key by key; after a value, only a comment.
+# 3. The configuration block: the first nine lines, key by key; after a value, only a comment.
 end='[[:space:]]*(//.*)?$'
 n=0; cfg_ok=1
 while IFS= read -r pattern; do
@@ -96,6 +96,7 @@ done <<BLOCK
 ^const CONFIG = \{\$
 ^  CTA_LABEL: '[^']+',$end
 ^  SIGN_IN_URL: '[^']*',$end
+^  SIGN_IN_LABEL: '[^']+',$end
 ^  PROSPECT_DOOR_URL: '[^']*',$end
 ^  TRIAL_ON: (true|false),$end
 ^  PREVIEW_DAYS: [0-9]+, TRIAL_DAYS: [0-9]+,$end
@@ -105,14 +106,14 @@ BLOCK
 [ "$cfg_ok" -eq 1 ] && ok "site.js opens with the configuration block, its keys in order, values single-quoted"
 config_value() { sed -n "${1}p" "$JS" | sed -E "s/^[^']*'([^']*)'.*/\1/"; }   # $1 the block's line number
 if [ "$cfg_ok" -eq 1 ]; then
-  for pair in 3:SIGN_IN_URL 4:PROSPECT_DOOR_URL; do
+  for pair in 3:SIGN_IN_URL 5:PROSPECT_DOOR_URL; do
     key="${pair#*:}"; val="$(config_value "${pair%%:*}")"
-    if [ -z "$val" ] && [ "$key" = SIGN_IN_URL ]; then ok "SIGN_IN_URL is empty (the Sign in link is not rendered)"
+    if [ -z "$val" ] && [ "$key" = SIGN_IN_URL ]; then ok "SIGN_IN_URL is empty (the sign-in link is not rendered)"
     elif [ -z "$val" ]; then ok "PROSPECT_DOOR_URL is empty (Try it free is a mailto: link; the modal is not offered)"
     elif printf '%s' "$val" | grep -q -E '^https://([a-z0-9-]+\.)*civiumcre\.com(/|$)'; then ok "$key is $val"
     else bad "$key must be empty or https on civiumcre.com, not $val"; fi
   done
-  hero="$(config_value 7)"
+  hero="$(config_value 8)"
   if [ -z "$hero" ]; then ok "HERO_IMAGE is empty (the dark fill shows)"
   elif [ "${hero#/}" != "$hero" ] && [ "${hero#//}" = "$hero" ] && [ -n "$(resolve "$DOCS/index.html" "$hero")" ]; then
     ok "HERO_IMAGE resolves: $hero"

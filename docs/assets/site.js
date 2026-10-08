@@ -1,15 +1,16 @@
 const CONFIG = {
   CTA_LABEL: 'Try it free',     // README "Open items": parked wording — one string, printed everywhere it appears
-  SIGN_IN_URL: '',              // the app's sign-in (https://app.civiumcre.com); '' = the Sign in link is not rendered
-  PROSPECT_DOOR_URL: '',        // the app's prospect door (§4); '' = the modal is not offered (the off state below)
+  SIGN_IN_URL: 'https://app.civiumcre.com/',   // the app's sign-in; '' = the sign-in link is not rendered
+  SIGN_IN_LABEL: 'Client portal',              // the sign-in link's words — one string
+  PROSPECT_DOOR_URL: 'https://app.civiumcre.com/api/prospect',   // the app's prospect door (§4), no trailing slash; '' = the modal is not offered (the off state below)
   TRIAL_ON: true,               // README "Open items": '' false = Privacy item 2 and the modal's steps 2–3 are not rendered
   PREVIEW_DAYS: 7, TRIAL_DAYS: 15,   // the README's numbers, printed where the copy prints them
   HERO_IMAGE: ''                // Caden's photo or render; '' = the dark fill
 };
 
 // civiumcre.com — the site's one script. Above: Caden's switches. Below: the copy they print, the trial switch,
-// Sign in, Try it free (the modal and the door, or the mailto: off state), the sample page, the grain, the receipt
-// cards, the pricing toggle and the motion of design_handoff_site/README.md ("Interactions and motion"); with
+// the sign-in link, Try it free (the modal and the door, or the mailto: off state), the sample page, the grain, the
+// receipt cards, the pricing toggle and the motion of design_handoff_site/README.md ("Interactions and motion"); with
 // prefers-reduced-motion set, no motion runs and the final state shows.
 (() => {
   'use strict';
@@ -27,12 +28,12 @@ const CONFIG = {
   // half of step 1's note are not rendered, so the note reads "No card needed."
   if (!CONFIG.TRIAL_ON) $$('[data-trial]').forEach(el => el.remove());
 
-  // Sign in: the nav's own link style, before the primary button, only when SIGN_IN_URL is set.
+  // The sign-in link: SIGN_IN_LABEL, in the nav's link style before the primary button, when SIGN_IN_URL is set.
   if (CONFIG.SIGN_IN_URL) $$('.header .nav').forEach(nav => {
     const a = document.createElement('a');
     a.className = 'nav-link';
     a.href = CONFIG.SIGN_IN_URL;
-    a.textContent = 'Sign in';
+    a.textContent = CONFIG.SIGN_IN_LABEL;
     nav.insertBefore(a, $('[data-cta]', nav));
   });
 
