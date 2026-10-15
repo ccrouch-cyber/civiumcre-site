@@ -5,6 +5,9 @@ const CONFIG = {
   PROSPECT_DOOR_URL: 'https://app.civiumcre.com/api/prospect',   // the app's prospect door (§4), no trailing slash; '' = the modal is not offered (the off state below)
   TRIAL_ON: true,               // README "Open items": '' false = Privacy item 2 and the modal's steps 2–3 are not rendered
   PREVIEW_DAYS: 7, TRIAL_DAYS: 15,   // the README's numbers, printed where the copy prints them
+  PAY_LINK_DEAL: '',            // Stripe's Payment Link for one deal; '' = the button emails Caden
+  PAY_LINK_MONTHLY: '',         // Stripe's Payment Link for the monthly plan; '' = the button emails Caden
+  PAY_LINK_YEARLY: '',          // Stripe's Payment Link for the yearly plan; '' = the button emails Caden
   HERO_IMAGE: ''                // Caden's photo or render; '' = the dark fill
 };
 
@@ -244,12 +247,24 @@ const CONFIG = {
     if (!reduced) setInterval(() => { if (!userSrc) { src = src === 'noi' ? 'cap' : 'noi'; show(); } }, 3600);
   }
 
-  // Pricing: the billing toggle (two buttons with aria-pressed); Yearly is the default.
+  // Pricing: the billing toggle (two buttons with aria-pressed); Yearly is the default. The plan buttons
+  // ([data-pay]) open Stripe's Payment Links from CONFIG when those are set — the yearly or the monthly link follows
+  // the toggle, the deal link stands alone; an empty link leaves the button the mailto: it was written with.
   const billing = $$('[data-billing]');
+  const payButtons = $$('[data-pay]');
+  const setPay = mode => payButtons.forEach(a => {
+    a.dataset.mail = a.dataset.mail || a.getAttribute('href');
+    const link = a.dataset.pay === 'deal' ? CONFIG.PAY_LINK_DEAL
+      : (mode === 'yearly' ? CONFIG.PAY_LINK_YEARLY : CONFIG.PAY_LINK_MONTHLY);
+    if (link) { a.href = link; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    else { a.href = a.dataset.mail; a.removeAttribute('target'); a.removeAttribute('rel'); }
+  });
+  setPay('yearly');
   billing.forEach(b => b.addEventListener('click', () => {
     const mode = b.dataset.billing;
     billing.forEach(o => o.setAttribute('aria-pressed', String(o === b)));
     $$('[data-yearly]').forEach(el => { el.textContent = el.dataset[mode]; });
+    setPay(mode);
   }));
 
   // The value bridge: rows 520ms apart, each fading and rising 10px over 600ms; each bar grows over 900ms while

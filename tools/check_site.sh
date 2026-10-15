@@ -6,6 +6,7 @@
 #      sets must be root-relative. No ".." or "." path segments.
 #   3. The configuration block opens site.js, line by line: its keys in order, its values single-quoted, nothing
 #      after a value but a comment. Its URLs are empty or https on civiumcre.com; its image is a file under docs/.
+#      Its three PAY_LINK_* values are empty or https://buy.stripe.com/<id> (the only outside host, in site.js alone).
 #   4. No color literal outside site.css's single token block: no hex, rgb(), hsl(), hwb(), lab(), lch(), oklab(),
 #      oklch(), color(), color-mix() or device-cmyk() in any page, stylesheet, script or XML (any case); and no named
 #      or system color in a site.css value, a <style> element, a style attribute, a presentation attribute or a
@@ -104,6 +105,9 @@ done <<BLOCK
 ^  PROSPECT_DOOR_URL: '[^']*',$end
 ^  TRIAL_ON: (true|false),$end
 ^  PREVIEW_DAYS: [0-9]+, TRIAL_DAYS: [0-9]+,$end
+^  PAY_LINK_DEAL: '[^']*',$end
+^  PAY_LINK_MONTHLY: '[^']*',$end
+^  PAY_LINK_YEARLY: '[^']*',$end
 ^  HERO_IMAGE: '[^']*'$end
 ^\};\$
 BLOCK
@@ -117,7 +121,13 @@ if [ "$cfg_ok" -eq 1 ]; then
     elif printf '%s' "$val" | grep -q -E '^https://([a-z0-9-]+\.)*civiumcre\.com(/|$)'; then ok "$key is $val"
     else bad "$key must be empty or https on civiumcre.com, not $val"; fi
   done
-  hero="$(config_value 8)"
+  for pair in 8:PAY_LINK_DEAL 9:PAY_LINK_MONTHLY 10:PAY_LINK_YEARLY; do
+    key="${pair#*:}"; val="$(config_value "${pair%%:*}")"
+    if [ -z "$val" ]; then ok "$key is empty (the button emails Caden)"
+    elif printf '%s' "$val" | grep -q -E '^https://buy\.stripe\.com/[A-Za-z0-9_]+$'; then ok "$key is a Stripe Payment Link"
+    else bad "$key must be empty or https://buy.stripe.com/<id>, not $val"; fi
+  done
+  hero="$(config_value 11)"
   if [ -z "$hero" ]; then ok "HERO_IMAGE is empty (the dark fill shows)"
   elif [ "${hero#/}" != "$hero" ] && [ "${hero#//}" = "$hero" ] && [ -n "$(resolve "$DOCS/index.html" "$hero")" ]; then
     ok "HERO_IMAGE resolves: $hero"
@@ -182,10 +192,19 @@ done < <(pages)
 # 6. Hosts (text files only; images are skipped).
 hosts="$(grep -r -I -i -n -o -E 'https?://[^"'"'"'` )<>]+' "$DOCS" \
   | grep -v -i -E ':https?://(www\.w3\.org/2000/svg|www\.sitemaps\.org/schemas/sitemap/0\.9)$' \
-  | grep -v -i -E ':https://([a-z0-9-]+\.)*civiumcre\.com(/[^ ]*)?$' | sed "s|^$ROOT/||")"
+  | grep -v -i -E ':https://([a-z0-9-]+\.)*civiumcre\.com(/[^ ]*)?$' \
+  | grep -v -E 'assets/site\.js:[0-9]+:https://buy\.stripe\.com/[A-Za-z0-9_]+$' | sed "s|^$ROOT/||")"
 relhosts="$(grep -r -I -n -E "([\"'\`(=]|url\([[:space:]]*|^|[[:space:]])//[A-Za-z0-9]" "$DOCS" | sed "s|^$ROOT/||")"
 if [ -z "$hosts$relhosts" ]; then ok "no host other than civiumcre.com under docs/, no protocol-relative URL"
 else bad "outside hosts or protocol-relative URLs:"; printf '%s\n' "$hosts" "$relhosts" | grep -v '^$'; fi
+
+# 6b. The pricing buttons: one [data-pay="deal"] and one [data-pay="plan"] on the pricing page; site.js wires both.
+for which in deal plan; do
+  n="$(grep -o "data-pay=\"$which\"" "$DOCS/pricing/index.html" | wc -l | tr -d ' ')"
+  if [ "$n" = 1 ]; then ok "pricing: one $which button carries data-pay"; else bad "pricing: $n $which buttons carry data-pay"; fi
+done
+grep -q "CONFIG.PAY_LINK_DEAL" "$JS" && grep -q "CONFIG.PAY_LINK_YEARLY" "$JS" && grep -q "CONFIG.PAY_LINK_MONTHLY" "$JS" \
+  && ok "site.js wires the three Payment Links to the buttons" || bad "site.js does not read all three PAY_LINK keys"
 
 # 7. The door's post. A header set by hand, or an upload-progress listener, makes the browser preflight the post, and
 #    the door answers a preflight with a 405; credentials: 'include' hides the door's 202. A call is read from fetch(
