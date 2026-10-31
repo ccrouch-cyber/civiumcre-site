@@ -1,9 +1,10 @@
 const CONFIG = {
-  CTA_LABEL: 'Try it free',     // README "Open items": parked wording — one string, printed everywhere it appears
+  CTA_LABEL: 'Create account',  // the design's words (design_handoff_onboarding) — one string, printed everywhere it appears
+  SIGNUP_URL: 'https://app.civiumcre.com/signup',   // where Create account goes (the app's sign-up); '' = the Try it free modal below
   SIGN_IN_URL: 'https://app.civiumcre.com/',   // the app's sign-in; '' = the sign-in link is not rendered
   SIGN_IN_LABEL: 'Client portal',              // the sign-in link's words — one string
   PROSPECT_DOOR_URL: 'https://app.civiumcre.com/api/prospect',   // the app's prospect door (§4), no trailing slash; '' = the modal is not offered (the off state below)
-  TRIAL_ON: true,               // README "Open items": '' false = Privacy item 2 and the modal's steps 2–3 are not rendered
+  TRIAL_ON: false,              // README "Open items": '' false = Privacy item 2 and the modal's steps 2–3 are not rendered
   PREVIEW_DAYS: 7, TRIAL_DAYS: 15,   // the README's numbers, printed where the copy prints them
   PAY_LINK_DEAL: '',            // Stripe's Payment Link for one deal; '' = the button emails Caden
   PAY_LINK_MONTHLY: '',         // Stripe's Payment Link for the monthly plan; '' = the button emails Caden
@@ -42,8 +43,13 @@ const CONFIG = {
 
   // Try it free. Off (PROSPECT_DOOR_URL empty): the HTML's mailto: links stay, same label and look, and the modal is
   // removed. On: Home's controls open the modal; Pricing, FAQ and 404 link to /#try, which opens it on Home.
+  // Create account (the onboarding, 10/31): with SIGNUP_URL set, every control and the plan button go to the app's sign-up.
   const flow = $('[data-flow]');
-  if (!CONFIG.PROSPECT_DOOR_URL) {
+  if (CONFIG.SIGNUP_URL) {
+    if (flow) flow.remove();
+    $$('[data-cta]').forEach(a => { a.href = CONFIG.SIGNUP_URL; });
+    $$('[data-pay="plan"]').forEach(a => { a.dataset.mail = CONFIG.SIGNUP_URL; });
+  } else if (!CONFIG.PROSPECT_DOOR_URL) {
     if (flow) flow.remove();
   } else if (!flow) {
     $$('[data-cta]').forEach(a => { a.href = '/#try'; });

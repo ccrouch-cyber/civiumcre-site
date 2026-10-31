@@ -100,6 +100,7 @@ while IFS= read -r pattern; do
 done <<BLOCK
 ^const CONFIG = \{\$
 ^  CTA_LABEL: '[^']+',$end
+^  SIGNUP_URL: '[^']*',$end
 ^  SIGN_IN_URL: '[^']*',$end
 ^  SIGN_IN_LABEL: '[^']+',$end
 ^  PROSPECT_DOOR_URL: '[^']*',$end
@@ -114,20 +115,21 @@ BLOCK
 [ "$cfg_ok" -eq 1 ] && ok "site.js opens with the configuration block, its keys in order, values single-quoted"
 config_value() { sed -n "${1}p" "$JS" | sed -E "s/^[^']*'([^']*)'.*/\1/"; }   # $1 the block's line number
 if [ "$cfg_ok" -eq 1 ]; then
-  for pair in 3:SIGN_IN_URL 5:PROSPECT_DOOR_URL; do
+  for pair in 3:SIGNUP_URL 4:SIGN_IN_URL 6:PROSPECT_DOOR_URL; do
     key="${pair#*:}"; val="$(config_value "${pair%%:*}")"
-    if [ -z "$val" ] && [ "$key" = SIGN_IN_URL ]; then ok "SIGN_IN_URL is empty (the sign-in link is not rendered)"
+    if [ -z "$val" ] && [ "$key" = SIGNUP_URL ]; then ok "SIGNUP_URL is empty (the Try it free modal or its mailto: stands)"
+    elif [ -z "$val" ] && [ "$key" = SIGN_IN_URL ]; then ok "SIGN_IN_URL is empty (the sign-in link is not rendered)"
     elif [ -z "$val" ]; then ok "PROSPECT_DOOR_URL is empty (Try it free is a mailto: link; the modal is not offered)"
     elif printf '%s' "$val" | grep -q -E '^https://([a-z0-9-]+\.)*civiumcre\.com(/|$)'; then ok "$key is $val"
     else bad "$key must be empty or https on civiumcre.com, not $val"; fi
   done
-  for pair in 8:PAY_LINK_DEAL 9:PAY_LINK_MONTHLY 10:PAY_LINK_YEARLY; do
+  for pair in 9:PAY_LINK_DEAL 10:PAY_LINK_MONTHLY 11:PAY_LINK_YEARLY; do
     key="${pair#*:}"; val="$(config_value "${pair%%:*}")"
     if [ -z "$val" ]; then ok "$key is empty (the button emails Caden)"
     elif printf '%s' "$val" | grep -q -E '^https://buy\.stripe\.com/[A-Za-z0-9_]+$'; then ok "$key is a Stripe Payment Link"
     else bad "$key must be empty or https://buy.stripe.com/<id>, not $val"; fi
   done
-  hero="$(config_value 11)"
+  hero="$(config_value 12)"
   if [ -z "$hero" ]; then ok "HERO_IMAGE is empty (the dark fill shows)"
   elif [ "${hero#/}" != "$hero" ] && [ "${hero#//}" = "$hero" ] && [ -n "$(resolve "$DOCS/index.html" "$hero")" ]; then
     ok "HERO_IMAGE resolves: $hero"
