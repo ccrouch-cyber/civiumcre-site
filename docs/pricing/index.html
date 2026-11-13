@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pricing · Civium</title>
-<meta name="description" content="Civium reads your model and shows it back to you next to its own base model, with every number traced to its source.">
+<meta name="description" content="Civium reads your rent roll and T-12 and returns the full underwriting, with every number traced to its source.">
 <link rel="icon" href="data:,">
 <link rel="preload" href="/assets/fonts/source-serif-4-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
@@ -23,7 +23,7 @@
       <a class="nav-link" href="/pricing/" aria-current="page">Pricing</a>
       <a class="nav-link" href="/faq/">FAQ</a>
       <span class="h-sep" aria-hidden="true" data-sign-in-sep></span>
-      <a class="h-btn h-btn--nav" href="mailto:deals@civiumcre.com" data-cta>Create account</a>
+      <a class="h-btn h-btn--nav" href="/start/" data-cta>Get started</a>
     </nav>
   </header>
 </div></div>
@@ -33,42 +33,72 @@
       <div class="pr-head">
         <p class="h-eyebrow">Pricing</p>
         <h1 class="h-page-title">Every plan gets the same underwriting.</h1>
-        <p class="h-lead">Civium reads your model and shows it back to you next to its own base model, with every number traced to its source.</p>
+        <p class="h-lead">Civium reads your rent roll and T-12 and returns the full underwriting, with every number traced to its source.</p>
       </div>
-      <!-- Every card has the same .pr-term slot, so the prices line up; only Individual fills it, with the billing toggle. -->
+      <!-- Every card has the same .pr-term slot, so the four prices line up; only Civium fills it, with the billing toggle. -->
       <div class="pr-plans">
         <div class="pr-plan">
-          <h2 class="pr-name">Per deal</h2>
-          <p class="pr-sub">One property.</p>
+          <h2 class="pr-name">Civium Free</h2>
+          <p class="pr-sub">One deal of your own.</p>
           <div class="pr-term"></div>
-          <div class="pr-price-line"><span class="pr-price">$500</span><span class="pr-per">a deal</span></div>
-          <p class="pr-alt">Minutes for most deals, next day at the latest.</p>
-          <a class="h-btn pr-btn" href="mailto:ccrouch@civiumcre.com" data-pay="deal">Buy one deal</a>
+          <div class="pr-price-line"><span class="pr-price">Free</span></div>
+          <p class="pr-alt">Then $200 a deal for your first 5, $500 after.</p>
+          <ul class="pr-items">
+            <li>No card</li>
+            <li>Your deal stays open on your account</li>
+            <li>Comps where Civium already has them</li>
+            <li>A paid deal adds sharing, your book and Market for that deal</li>
+          </ul>
+          <a class="h-btn pr-btn h-btn--line" href="/start/" data-go="free">Start free</a>
         </div>
         <div class="pr-plan">
-          <h2 class="pr-name">Individual</h2>
-          <p class="pr-sub">For one broker. Every deal, all year.</p>
-          <div class="pr-term"><div class="pr-toggle" role="group" aria-label="Billing"><button type="button" class="pr-toggle-btn" data-billing="yearly" aria-pressed="true">Yearly</button><button type="button" class="pr-toggle-btn" data-billing="monthly" aria-pressed="false">Monthly</button></div></div>
-          <div class="pr-price-line"><span class="pr-price" data-yearly="$15,000" data-monthly="$1,500">$15,000</span><span class="pr-per" data-yearly="a year" data-monthly="a month">a year</span></div>
-          <p class="pr-alt" data-yearly="Two months free against $1,500 a month" data-monthly="Or $15,000 a year, two months free">Two months free against $1,500 a month</p>
-          <a class="h-btn pr-btn" href="mailto:ccrouch@civiumcre.com" data-pay="plan">Get started</a>
+          <h2 class="pr-name">Civium Trial</h2>
+          <p class="pr-sub">Card on file. Up to 5 deals.</p>
+          <div class="pr-term"></div>
+          <div class="pr-price-line"><span class="pr-price">$0</span><span class="pr-per">for 14 days</span></div>
+          <p class="pr-alt">Then Civium, at day 14 or with a 6th deal.</p>
+          <ul class="pr-items">
+            <li>Up to 5 deals over 14 days</li>
+            <li>Markets, cap rates and your data room</li>
+            <li>Sharing and your relationship book</li>
+            <li>Comps where Civium already has them</li>
+          </ul>
+          <a class="h-btn pr-btn" href="/start/" data-go="trial">Start the trial</a>
+        </div>
+        <div class="pr-plan">
+          <h2 class="pr-name">Civium</h2>
+          <p class="pr-sub">Every deal, all of Civium.</p>
+          <div class="pr-term"><div class="pr-toggle" role="group" aria-label="Billing"><button type="button" class="pr-toggle-btn" data-billing="monthly" aria-pressed="true">Monthly</button><button type="button" class="pr-toggle-btn" data-billing="yearly" aria-pressed="false">Yearly</button></div></div>
+          <div class="pr-price-line"><span class="pr-price" data-monthly="$1,500" data-yearly="$15,000">$1,500</span><span class="pr-per" data-monthly="a month" data-yearly="a year">a month</span></div>
+          <p class="pr-alt" data-monthly="Or $15,000 a year, two months free." data-yearly="Two months free against $1,500 a month.">Or $15,000 a year, two months free.</p>
+          <ul class="pr-items">
+            <li>Every deal you send</li>
+            <li>Market: any address or area, in every market</li>
+            <li>Sharing and your relationship book</li>
+            <li>Markets, cap rates and your data room</li>
+          </ul>
+          <a class="h-btn pr-btn" href="/start/" data-go="civium">Start Civium</a>
         </div>
         <div class="pr-plan pr-plan--night">
-          <h2 class="pr-name">Team</h2>
-          <p class="pr-sub">Two brokers or more.</p>
+          <h2 class="pr-name">Civium Custom</h2>
+          <p class="pr-sub">Civium, built around how you work.</p>
           <div class="pr-term"></div>
           <div class="pr-price-line"><span class="pr-price">Custom</span></div>
-          <p class="pr-alt">Priced to the size of your team.</p>
-          <a class="h-btn pr-btn h-btn--ghost" href="mailto:ccrouch@civiumcre.com">Talk to us</a>
+          <p class="pr-alt">Priced to what you need. Starts with a call with Caden.</p>
+          <ul class="pr-items">
+            <li>Everything in Civium</li>
+            <li>Monthly customizations from your own list</li>
+            <li>Meetings with Caden</li>
+          </ul>
+          <a class="h-btn pr-btn h-btn--ghost" href="mailto:ccrouch@civiumcre.com" data-book="custom">Book a call</a>
         </div>
       </div>
+      <p class="pr-team">Pricing for a team? <a class="h-link" href="mailto:ccrouch@civiumcre.com" data-book="team">Book a call with Caden →</a></p>
       <div class="pr-includes">
         <h2 class="h-eyebrow">Every plan includes</h2>
         <ul class="pr-list">
-          <li>Your model, read and shown back to you</li>
           <li>Civium’s base model on every deal</li>
           <li>Every number traced to its source</li>
-          <li>Rents and expenses compared against your own deals</li>
         </ul>
         <div>
           <h3 class="pr-own-title">Your deals are yours.</h3>

@@ -77,6 +77,28 @@
   --coastal-app-serif: Georgia, 'Times New Roman', serif;               /* the trust mock, as the app sets it */
   --coastal-app-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   --coastal-ease: cubic-bezier(.22,.61,.24,1);
+
+  /* The Get started window and the four-plan Pricing page (the newer sign-up design: "Get started window",
+     "Booking view", "2. Pricing", "Design tokens") */
+  --coastal-card: #FAF6EE;                     /* the window's right side, Pricing's cards */
+  --coastal-ondeep3: #C9D0D6;                  /* the lists on the window's four panels */
+  --coastal-dash: #D9B48C;                     /* the dash before each line of those lists */
+  --coastal-hair-12: rgba(36,48,58,.12);       /* Pricing: the rules between a plan's lines */
+  --coastal-hair-20: rgba(36,48,58,.2);        /* the window's close button */
+  --coastal-rule-20: rgba(246,241,232,.2);     /* Pricing: the rules on the Civium Custom card */
+  --coastal-start-ground: rgba(18,24,30,.6);   /* behind the window */
+  --coastal-start-shade: linear-gradient(180deg, rgba(22,30,38,.42) 0, rgba(22,30,38,.08) 36%, rgba(22,30,38,.82) 100%);   /* over the window's photo */
+  --coastal-start-demo: linear-gradient(115deg, #5E6F67 0%, #3A4844 55%, #26302D 100%);    /* the Civium Demo panel */
+  --coastal-start-demo-flat: #33433F;          /* ... and its fill before the textures load */
+  --coastal-start-meet: linear-gradient(115deg, #6E5A4C 0%, #4A3D35 55%, #2F2723 100%);    /* Book a meeting */
+  --coastal-start-meet-flat: #3E3430;
+  --coastal-start-free: linear-gradient(115deg, #736C58 0%, #4D493C 55%, #34312A 100%);    /* Civium Free */
+  --coastal-start-free-flat: #4A4639;
+  --coastal-start-trial: linear-gradient(115deg, #4C5E70 0%, #2F3B49 55%, #212A34 100%);   /* Civium Trial */
+  --coastal-start-trial-flat: #2C3744;
+  --coastal-shadow-start: 0 40px 100px -30px rgba(0,0,0,.6);
+  --coastal-shadow-preview: 0 24px 60px -24px rgba(0,0,0,.7);
+  --coastal-ease-start: cubic-bezier(.2,.75,.2,1);
 }
 /* tokens:end */
 

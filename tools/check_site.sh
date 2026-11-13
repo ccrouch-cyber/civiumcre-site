@@ -1,23 +1,33 @@
 #!/usr/bin/env bash
 # tools/check_site.sh — the site's own checks. Run from anywhere: bash tools/check_site.sh
 #   1. docs/assets/tokens.css and system.css are byte-for-byte the repo's tokens (Pages serves only docs/).
-#   2. Every href and src in the pages, and every href or src site.js sets, resolves to a file under docs/ (and to
-#      an id inside a tag, outside comments), or is mailto: or data:. site.js runs on every page, so the paths it
-#      sets must be root-relative. No ".." or "." path segments.
+#   2. Every href and src in the pages, every href or src site.js sets, and every href, src or srcset written inside
+#      site.js's templates resolves to a file under docs/ (and to an id inside a tag, outside comments), or is mailto:
+#      or data:. So does every address in a page's srcset and every url() in the site's stylesheets. site.js runs on
+#      every page, so the paths it sets must be root-relative. No ".." or "." path segments.
 #   3. The configuration block opens site.js, line by line: its keys in order, its values single-quoted, nothing
-#      after a value but a comment. Its URLs are empty or https on civiumcre.com; its image is a file under docs/.
-#      Its three PAY_LINK_* values are empty or https://buy.stripe.com/<id> (the only outside host, in site.js alone).
+#      after a value but a comment. The four doors into the app (demo, free, trial, Civium) are https on
+#      app.civiumcre.com, and each Start address names its own plan; SIGN_IN_URL is the same host or empty;
+#      APP_ORIGIN is exactly https://app.civiumcre.com; PRICING_URL is a path to a page under docs/; TALK_MAIL is a
+#      mailto: address; SCHEDULER_URL is empty or one https address.
 #   4. No color literal outside site.css's single token block: no hex, rgb(), hsl(), hwb(), lab(), lch(), oklab(),
 #      oklch(), color(), color-mix() or device-cmyk() in any page, stylesheet, script or XML (any case); and no named
 #      or system color in a site.css value, a <style> element, a style attribute, a presentation attribute or a
 #      script string. Images are not scanned.
 #   5. Exactly one <h1> per page.
 #   6. No host other than civiumcre.com in any text file under docs/ (the SVG and sitemap namespace names excepted),
-#      and no protocol-relative URL.
-#   7. The door's post: exactly one fetch( call in site.js names PROSPECT_DOOR_URL; it carries credentials: 'omit'
-#      and no other credentials, and no headers key; and site.js names no XMLHttpRequest, setRequestHeader,
-#      onprogress or upload.addEventListener anywhere.
-#   8. site.js makes exactly one fetch( call in all; PROSPECT_DOOR_URL has no trailing slash.
+#      and no protocol-relative URL. One exception: the scheduler's address, on SCHEDULER_URL's own line of site.js.
+#   7. The buttons. Every [data-cta] is a link to /start/. Pricing has one Start free, one Start the trial and one
+#      Start Civium (data-go), Book a call and the team line (data-book custom, team), and the billing toggle with
+#      Monthly pressed. Every [data-book] link carries TALK_MAIL, the same address the configuration holds.
+#   8. The Get started window is built once: site.js makes one <dialog>, no page holds the window's markup, and only
+#      docs/start/index.html is the window's own page ([data-gs-page]).
+#   9. Frames. No page and no template in site.js holds a frame, an object or an embed. site.js makes at most one
+#      frame, and its address is CONFIG.SCHEDULER_URL.
+#  10. site.js asks the network for nothing and listens to nobody: no fetch(, XMLHttpRequest, sendBeacon, WebSocket,
+#      EventSource, import( or form submit, and no message listener. Its one postMessage tells CONFIG.APP_ORIGIN, and
+#      only that origin, that the framed window closed. (What it loads are the site's own pictures, rule 2, and the
+#      one frame, rule 9.)
 # Exits 1 on any failure. Uses bash 3.2, grep, sed, awk and cmp only.
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -76,8 +86,29 @@ fail_before=$fail
 while IFS= read -r page; do
   while IFS= read -r url; do check_url "$page" "$url" "$page"; done \
     < <(grep -o -E '(href|src)="[^"]*"' "$page" | sed -E 's/^(href|src)="(.*)"$/\2/')
-  grep -q -E "(href|src)='" "$page" && bad "$(rel "$page"): a single-quoted href or src (write them double-quoted)"
+  while IFS= read -r url; do [ -n "$url" ] && check_url "$page" "$url" "$page"; done \
+    < <(grep -o -E 'srcset="[^"]*"' "$page" | sed -E 's/^srcset="(.*)"$/\1/' | tr ',' '\n' | awk '{ print $1 }')
+  grep -q -E "(href|src|srcset)='" "$page" && bad "$(rel "$page"): a single-quoted href, src or srcset (write them double-quoted)"
 done < <(pages)
+# The templates inside site.js: the same attributes, written as markup. Each must be a path from /.
+while IFS= read -r url; do
+  case "$url" in
+    '') ;;
+    *'${'*) bad "site.js writes an href, src or srcset that cannot be checked: $url" ;;
+    /*) check_url "$JS" "$url" "$DOCS/index.html" ;;
+    *) bad "site.js writes a relative or outbound href, src or srcset in a template: $url" ;;
+  esac
+done < <({ grep -o -E '(href|src)="[^"]*"' "$JS" | sed -E 's/^(href|src)="(.*)"$/\2/'
+           grep -o -E 'srcset="[^"]*"' "$JS" | sed -E 's/^srcset="(.*)"$/\1/' | tr ',' '\n' | awk '{ print $1 }'; })
+# The stylesheets: every url() is a file beside them.
+while IFS= read -r sheet; do
+  case "$sheet" in "$DOCS/assets/tokens.css"|"$DOCS/assets/system.css") continue ;; esac
+  while IFS= read -r url; do
+    links=$((links + 1))
+    case "$url" in data:*) continue ;; esac
+    [ -n "$(resolve "$sheet" "$url")" ] || bad "$(rel "$sheet"): url($url) does not resolve to a file under docs/"
+  done < <(grep -o -E 'url\([^)]*\)' "$sheet" | sed -E "s/^url\([[:space:]]*[\"']?//; s/[\"']?[[:space:]]*\)\$//")
+done < <(find "$DOCS" -name '*.css' | sort)
 q="(\"[^\"]*\"|'[^']*'|\`[^\`]*\`)"
 while IFS= read -r lit; do
   url="${lit:1:${#lit}-2}"
@@ -89,9 +120,9 @@ while IFS= read -r lit; do
   esac
 done < <(grep -o -E "\.(href|src)[[:space:]]*=[[:space:]]*$q|setAttribute\([[:space:]]*['\"](href|src)['\"][[:space:]]*,[[:space:]]*$q" "$JS" \
          | grep -o -E "$q\$")
-[ "$fail" -eq "$fail_before" ] && ok "$links href/src values resolve under docs/ (pages and site.js; files, #ids, mailto:, data:)"
+[ "$fail" -eq "$fail_before" ] && ok "$links href, src, srcset and url() values resolve under docs/ (pages, site.js and the stylesheets; files, #ids, mailto:, data:)"
 
-# 3. The configuration block: the first nine lines, key by key; after a value, only a comment.
+# 3. The configuration block: the first thirteen lines, key by key; after a value, only a comment.
 end='[[:space:]]*(//.*)?$'
 n=0; cfg_ok=1
 while IFS= read -r pattern; do
@@ -100,40 +131,48 @@ while IFS= read -r pattern; do
 done <<BLOCK
 ^const CONFIG = \{\$
 ^  CTA_LABEL: '[^']+',$end
-^  SIGNUP_URL: '[^']*',$end
+^  DEMO_URL: '[^']*',$end
+^  FREE_URL: '[^']*',$end
+^  TRIAL_URL: '[^']*',$end
+^  CIVIUM_URL: '[^']*',$end
 ^  SIGN_IN_URL: '[^']*',$end
 ^  SIGN_IN_LABEL: '[^']+',$end
-^  PROSPECT_DOOR_URL: '[^']*',$end
-^  TRIAL_ON: (true|false),$end
-^  PREVIEW_DAYS: [0-9]+, TRIAL_DAYS: [0-9]+,$end
-^  PAY_LINK_DEAL: '[^']*',$end
-^  PAY_LINK_MONTHLY: '[^']*',$end
-^  PAY_LINK_YEARLY: '[^']*',$end
-^  HERO_IMAGE: '[^']*'$end
+^  PRICING_URL: '[^']*',$end
+^  APP_ORIGIN: '[^']*',$end
+^  SCHEDULER_URL: '[^']*',$end
+^  TALK_MAIL: '[^']*'$end
 ^\};\$
 BLOCK
 [ "$cfg_ok" -eq 1 ] && ok "site.js opens with the configuration block, its keys in order, values single-quoted"
 config_value() { sed -n "${1}p" "$JS" | sed -E "s/^[^']*'([^']*)'.*/\1/"; }   # $1 the block's line number
+sched=""; talk=""
 if [ "$cfg_ok" -eq 1 ]; then
-  for pair in 3:SIGNUP_URL 4:SIGN_IN_URL 6:PROSPECT_DOOR_URL; do
-    key="${pair#*:}"; val="$(config_value "${pair%%:*}")"
-    if [ -z "$val" ] && [ "$key" = SIGNUP_URL ]; then ok "SIGNUP_URL is empty (the Try it free modal or its mailto: stands)"
-    elif [ -z "$val" ] && [ "$key" = SIGN_IN_URL ]; then ok "SIGN_IN_URL is empty (the sign-in link is not rendered)"
-    elif [ -z "$val" ]; then ok "PROSPECT_DOOR_URL is empty (Try it free is a mailto: link; the modal is not offered)"
-    elif printf '%s' "$val" | grep -q -E '^https://([a-z0-9-]+\.)*civiumcre\.com(/|$)'; then ok "$key is $val"
-    else bad "$key must be empty or https on civiumcre.com, not $val"; fi
+  app='^https://app\.civiumcre\.com'
+  val="$(config_value 3)"
+  if printf '%s' "$val" | grep -q -E "$app/[^[:space:]]*\$"; then ok "DEMO_URL is $val"
+  else bad "DEMO_URL must be https on app.civiumcre.com, not '$val'"; fi
+  for trio in 4:FREE_URL:free 5:TRIAL_URL:trial 6:CIVIUM_URL:civium; do
+    line="${trio%%:*}"; rest="${trio#*:}"; key="${rest%%:*}"; plan="${rest#*:}"; val="$(config_value "$line")"
+    if printf '%s' "$val" | grep -q -E "$app/[^[:space:]]*[?&]plan=$plan\$"; then ok "$key is $val"
+    else bad "$key must be https on app.civiumcre.com and end in plan=$plan, not '$val'"; fi
   done
-  for pair in 9:PAY_LINK_DEAL 10:PAY_LINK_MONTHLY 11:PAY_LINK_YEARLY; do
-    key="${pair#*:}"; val="$(config_value "${pair%%:*}")"
-    if [ -z "$val" ]; then ok "$key is empty (the button emails Caden)"
-    elif printf '%s' "$val" | grep -q -E '^https://buy\.stripe\.com/[A-Za-z0-9_]+$'; then ok "$key is a Stripe Payment Link"
-    else bad "$key must be empty or https://buy.stripe.com/<id>, not $val"; fi
-  done
-  hero="$(config_value 12)"
-  if [ -z "$hero" ]; then ok "HERO_IMAGE is empty (the dark fill shows)"
-  elif [ "${hero#/}" != "$hero" ] && [ "${hero#//}" = "$hero" ] && [ -n "$(resolve "$DOCS/index.html" "$hero")" ]; then
-    ok "HERO_IMAGE resolves: $hero"
-  else bad "HERO_IMAGE must be a path from / to a file under docs/: $hero"; fi
+  val="$(config_value 7)"
+  if [ -z "$val" ]; then ok "SIGN_IN_URL is empty (the sign-in links are not rendered)"
+  elif printf '%s' "$val" | grep -q -E "$app(/[^[:space:]]*)?\$"; then ok "SIGN_IN_URL is $val"
+  else bad "SIGN_IN_URL must be empty or https on app.civiumcre.com, not '$val'"; fi
+  val="$(config_value 9)"
+  if [ "${val#/}" != "$val" ] && [ "${val#//}" = "$val" ] && [ -n "$(resolve "$DOCS/index.html" "$val")" ]; then ok "PRICING_URL resolves: $val"
+  else bad "PRICING_URL must be a path from / to a page under docs/, not '$val'"; fi
+  val="$(config_value 10)"
+  if [ "$val" = "https://app.civiumcre.com" ]; then ok "APP_ORIGIN is $val"
+  else bad "APP_ORIGIN must be exactly https://app.civiumcre.com (an origin: no path, no slash), not '$val'"; fi
+  sched="$(config_value 11)"
+  if [ -z "$sched" ]; then ok "SCHEDULER_URL is empty (the booking buttons write to TALK_MAIL)"
+  elif printf '%s' "$sched" | grep -q -E '^https://[a-z0-9]([a-z0-9.-]*[a-z0-9])?(/[^[:space:]@\\]*)?$'; then ok "SCHEDULER_URL is $sched (the one outside host the site names)"
+  else bad "SCHEDULER_URL must be empty or one https address (lower-case host, no user, no port), not '$sched'"; fi
+  talk="$(config_value 12)"
+  if printf '%s' "$talk" | grep -q -E '^mailto:[^@[:space:]?]+@[^@[:space:]?]+\.[a-z]+$'; then ok "TALK_MAIL is $talk"
+  else bad "TALK_MAIL must be a mailto: address, not '$talk'"; fi
 fi
 
 # 4. Color literals.
@@ -191,70 +230,70 @@ while IFS= read -r page; do
   if [ "$n" = 1 ]; then ok "$(rel "$page"): one h1"; else bad "$(rel "$page"): $n h1 elements"; fi
 done < <(pages)
 
-# 6. Hosts (text files only; images are skipped).
+# 6. Hosts (text files only; images are skipped). The scheduler's address is let through on its own line of site.js,
+#    whole and exactly as the configuration holds it, and nowhere else.
 hosts="$(grep -r -I -i -n -o -E 'https?://[^"'"'"'` )<>]+' "$DOCS" \
   | grep -v -i -E ':https?://(www\.w3\.org/2000/svg|www\.sitemaps\.org/schemas/sitemap/0\.9)$' \
   | grep -v -i -E ':https://([a-z0-9-]+\.)*civiumcre\.com(/[^ ]*)?$' \
-  | grep -v -E 'assets/site\.js:[0-9]+:https://buy\.stripe\.com/[A-Za-z0-9_]+$' | sed "s|^$ROOT/||")"
+  | { if [ -n "$sched" ]; then grep -v -F -x "$JS:11:$sched"; else cat; fi; } | sed "s|^$ROOT/||")"
 relhosts="$(grep -r -I -n -E "([\"'\`(=]|url\([[:space:]]*|^|[[:space:]])//[A-Za-z0-9]" "$DOCS" | sed "s|^$ROOT/||")"
-if [ -z "$hosts$relhosts" ]; then ok "no host other than civiumcre.com under docs/, no protocol-relative URL"
+if [ -z "$hosts$relhosts" ]; then ok "no host other than civiumcre.com under docs/${sched:+ (but the configured scheduler, on its line)}, no protocol-relative URL"
 else bad "outside hosts or protocol-relative URLs:"; printf '%s\n' "$hosts" "$relhosts" | grep -v '^$'; fi
 
-# 6b. The pricing buttons: one [data-pay="deal"] and one [data-pay="plan"] on the pricing page; site.js wires both.
-for which in deal plan; do
-  n="$(grep -o "data-pay=\"$which\"" "$DOCS/pricing/index.html" | wc -l | tr -d ' ')"
-  if [ "$n" = 1 ]; then ok "pricing: one $which button carries data-pay"; else bad "pricing: $n $which buttons carry data-pay"; fi
+# 7. The buttons. Tags are read one per line: each <a ...> or <button ...> opening tag, comments removed.
+tags() { strip_html_comments "$1" | grep -o -E '<(a|button)[[:space:]][^>]*>'; }   # $1 a page
+fail_before=$fail
+PRICING="$DOCS/pricing/index.html"
+while IFS= read -r page; do
+  while IFS= read -r tag; do
+    case "$tag" in
+      *'data-cta'*) case "$tag" in '<a '*'href="/start/"'*) ;; *) bad "$(rel "$page"): a [data-cta] that is not a link to /start/: $tag" ;; esac ;;
+    esac
+    case "$tag" in
+      *'data-book="'*) case "$tag" in '<a '*"href=\"$talk\""*) ;; *) bad "$(rel "$page"): a [data-book] link without href=\"$talk\" (TALK_MAIL): $tag" ;; esac ;;
+    esac
+  done < <(tags "$page")
+done < <(pages)
+for want in 'data-go="free"' 'data-go="trial"' 'data-go="civium"' 'data-book="custom"' 'data-book="team"' \
+            'data-billing="monthly" aria-pressed="true"' 'data-billing="yearly" aria-pressed="false"'; do
+  n="$(tags "$PRICING" | grep -c -F "$want")"
+  [ "$n" = 1 ] || bad "pricing: $n tags carry $want (exactly one)"
 done
-grep -q "CONFIG.PAY_LINK_DEAL" "$JS" && grep -q "CONFIG.PAY_LINK_YEARLY" "$JS" && grep -q "CONFIG.PAY_LINK_MONTHLY" "$JS" \
-  && ok "site.js wires the three Payment Links to the buttons" || bad "site.js does not read all three PAY_LINK keys"
+for key in DEMO_URL FREE_URL TRIAL_URL CIVIUM_URL SIGN_IN_URL PRICING_URL TALK_MAIL; do
+  grep -q "CONFIG\.$key" "$JS" || bad "site.js never reads CONFIG.$key"
+done
+[ "$fail" -eq "$fail_before" ] && ok "the buttons: every [data-cta] links to /start/, Pricing has its three Start buttons, two booking links and the toggle, every [data-book] carries TALK_MAIL"
 
-# 7. The door's post. A header set by hand, or an upload-progress listener, makes the browser preflight the post, and
-#    the door answers a preflight with a 405; credentials: 'include' hides the door's 202. A call is read from fetch(
-#    to its closing parenthesis, with // comments removed.
-fetch_calls() {  # stdout: each fetch( call in site.js, on one line
-  sed -E 's#(^|[[:space:]])//.*$#\1#' "$JS" | awk '
-    { src = src " " $0 }
-    END {
-      while (match(src, /[^A-Za-z0-9_$]fetch[ \t]*\(/)) {
-        k = RSTART + RLENGTH - 1; depth = 0; call = ""
-        for (; k <= length(src); k++) {
-          c = substr(src, k, 1); call = call c
-          if (c == "(") depth++
-          else if (c == ")") { depth--; if (depth == 0) break }
-        }
-        print "fetch" call
-        src = substr(src, RSTART + RLENGTH)
-      }
-    }'
-}
+# 8. The window is built once.
 fail_before=$fail
-door="$(fetch_calls | grep -F 'PROSPECT_DOOR_URL')"
-n="$(printf '%s' "$door" | awk 'END { print NR }')"
-if [ "$n" -ne 1 ]; then bad "site.js: $n fetch( calls name PROSPECT_DOOR_URL (exactly one posts to the door)"
-else
-  omit="$(printf '%s\n' "$door" | grep -c -E "credentials[[:space:]]*:[[:space:]]*['\"]omit['\"]")"
-  other="$(printf '%s\n' "$door" | sed -E "s/credentials[[:space:]]*:[[:space:]]*['\"]omit['\"]//g" | grep -c -w credentials)"
-  [ "$omit" = 1 ] && [ "$other" = 0 ] \
-    || bad "site.js: the door's fetch( call must carry credentials: 'omit' and no other credentials (credentials: 'include' hides the door's 202)"
-  printf '%s\n' "$door" | grep -q -w headers \
-    && bad "site.js: the door's fetch( call has a headers key (a header set by hand preflights into the door's 405)"
-fi
-traps="$(grep -n -E 'XMLHttpRequest|setRequestHeader|onprogress|upload\.addEventListener' "$JS")"
-if [ -n "$traps" ]; then
-  bad "site.js names XMLHttpRequest, setRequestHeader, onprogress or upload.addEventListener (the door's post is one fetch; a header set by hand or an upload-progress listener preflights into the door's 405):"
-  printf '%s\n' "$traps"
-fi
-[ "$fail" -eq "$fail_before" ] && ok "site.js posts to the door in one fetch( call: credentials 'omit', no headers key, nothing that preflights"
+code="$(sed -E 's#(^|[[:space:]])//.*$#\1#' "$JS")"   # site.js without its // comments
+n="$(printf '%s\n' "$code" | grep -c -E "createElement\([[:space:]]*['\"]dialog['\"]")"
+[ "$n" = 1 ] || bad "site.js makes $n <dialog> elements (exactly one: the Get started window)"
+copies="$(grep -n -E '<dialog|class="[^"]*gs-(card|side|main|panel|choose|book|row|btn|close|foot)' $(pages) | sed "s|^$ROOT/||")"
+[ -z "$copies" ] || { bad "a page holds the Get started window's markup (site.js builds it; pages only link to /start/):"; printf '%s\n' "$copies"; }
+own="$(grep -l 'data-gs-page' $(pages) | sed "s|^$ROOT/||" | tr '\n' ' ')"
+[ "$own" = "docs/start/index.html " ] || bad "[data-gs-page] must be on docs/start/index.html alone, not: ${own:-no page}"
+[ "$fail" -eq "$fail_before" ] && ok "the Get started window is built once, by site.js; /start/ is its own page"
 
-# 8. Two more guards on the door's post: site.js makes exactly one fetch( call in all (a second one could reach the door
-#    through a variable the check cannot see), and PROSPECT_DOOR_URL never ends in "/" (the door answers a trailing slash
-#    with a 307, which a cross-origin post cannot follow into a 202).
+# 9. Frames.
 fail_before=$fail
-all_fetches="$(fetch_calls | awk 'END { print NR }')"
-[ "$all_fetches" -eq 1 ] || bad "site.js makes $all_fetches fetch( calls in all (exactly one, the door's)"
-door_url="$(sed -n '5p' "$JS" | sed -E "s/^[^']*'([^']*)'.*/\1/")"
-case "$door_url" in */) bad "PROSPECT_DOOR_URL ends in a slash: $door_url (the door answers a trailing slash with a 307)" ;; esac
-[ "$fail" -eq "$fail_before" ] && ok "site.js makes one fetch( call in all; PROSPECT_DOOR_URL has no trailing slash"
+framed="$(grep -r -I -i -n -E '<(iframe|frame|object|embed)[[:space:]>]' "$DOCS" | sed "s|^$ROOT/||")"
+[ -z "$framed" ] || { bad "a frame, object or embed written as markup:"; printf '%s\n' "$framed"; }
+n="$(printf '%s\n' "$code" | grep -c -E "createElement\([[:space:]]*['\"](iframe|frame|object|embed)['\"]")"
+m="$(printf '%s\n' "$code" | grep -c -E '\.src[[:space:]]*=[[:space:]]*CONFIG\.SCHEDULER_URL[[:space:]]*;')"
+if [ "$n" = 0 ] && [ "$m" = 0 ]; then :
+elif [ "$n" = 1 ] && [ "$m" = 1 ]; then :
+else bad "site.js makes $n frames and sets $m of them to CONFIG.SCHEDULER_URL (at most one frame, and that address)"; fi
+[ "$fail" -eq "$fail_before" ] && ok "frames: none written as markup; site.js makes $n, for CONFIG.SCHEDULER_URL"
+
+# 10. No network call, no listener, one postMessage.
+fail_before=$fail
+net="$(printf '%s\n' "$code" | grep -n -E "(^|[^A-Za-z0-9_\$.])(fetch|import|importScripts)[[:space:]]*\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource|RTCPeerConnection|serviceWorker|\.submit[[:space:]]*\(|['\"]message['\"]|onmessage")"
+[ -z "$net" ] || { bad "site.js reaches for the network or listens for messages:"; printf '%s\n' "$net"; }
+n="$(printf '%s\n' "$code" | grep -c 'postMessage')"
+m="$(printf '%s\n' "$code" | grep -c -F "window.parent.postMessage({ civium: 'gs-close' }, CONFIG.APP_ORIGIN)")"
+{ [ "$n" = 1 ] && [ "$m" = 1 ]; } || bad "site.js names postMessage on $n lines, $m of them the close told to CONFIG.APP_ORIGIN (exactly one, never '*')"
+[ "$fail" -eq "$fail_before" ] && ok "site.js asks the network for nothing; its one postMessage tells CONFIG.APP_ORIGIN the framed window closed"
 
 if [ "$fail" -eq 0 ]; then echo "check_site: green"; else echo "check_site: RED"; fi
 exit $(( fail > 0 ))

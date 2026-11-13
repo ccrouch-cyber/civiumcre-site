@@ -1,22 +1,23 @@
 const CONFIG = {
-  CTA_LABEL: 'Create account',  // the design's words (design_handoff_onboarding) — one string, printed everywhere it appears
-  SIGNUP_URL: 'https://app.civiumcre.com/signup',   // where Create account goes (the app's sign-up); '' = the Try it free modal below
-  SIGN_IN_URL: 'https://app.civiumcre.com/',   // the app's sign-in; '' = the sign-in link is not rendered
-  SIGN_IN_LABEL: 'Client portal',              // the sign-in link's words — one string
-  PROSPECT_DOOR_URL: 'https://app.civiumcre.com/api/prospect',   // the app's prospect door (§4), no trailing slash; '' = the modal is not offered (the off state below)
-  TRIAL_ON: false,              // README "Open items": '' false = Privacy item 2 and the modal's steps 2–3 are not rendered
-  PREVIEW_DAYS: 7, TRIAL_DAYS: 15,   // the README's numbers, printed where the copy prints them
-  PAY_LINK_DEAL: '',            // Stripe's Payment Link for one deal; '' = the button emails Caden
-  PAY_LINK_MONTHLY: '',         // Stripe's Payment Link for the monthly plan; '' = the button emails Caden
-  PAY_LINK_YEARLY: '',          // Stripe's Payment Link for the yearly plan; '' = the button emails Caden
-  HERO_IMAGE: ''                // Caden's photo or render; '' = the dark fill
+  CTA_LABEL: 'Get started',     // the words on every button that opens the Get started window
+  DEMO_URL: 'https://app.civiumcre.com/#demo',                 // Open the demo
+  FREE_URL: 'https://app.civiumcre.com/signup?plan=free',      // Start free
+  TRIAL_URL: 'https://app.civiumcre.com/signup?plan=trial',    // Start the trial
+  CIVIUM_URL: 'https://app.civiumcre.com/signup?plan=civium',  // Start Civium, on Pricing; Yearly adds interval=year
+  SIGN_IN_URL: 'https://app.civiumcre.com/',                   // the app's sign-in; '' = the link is not rendered
+  SIGN_IN_LABEL: 'Client portal',                              // the sign-in link's words, one string
+  PRICING_URL: '/pricing/',                                    // See pricing and Ready to buy, inside the window
+  APP_ORIGIN: 'https://app.civiumcre.com',                     // the one page told that the framed window closed (/start/?embed=1)
+  SCHEDULER_URL: '',            // the scheduling page the booking view frames; '' = each booking button writes to TALK_MAIL
+  TALK_MAIL: 'mailto:ccrouch@civiumcre.com'                    // where the booking buttons write until SCHEDULER_URL is set
 };
 
-// civiumcre.com — the site's one script. Above: Caden's switches. Below: the copy they print, the trial switch,
-// the sign-in link (the header's, and Home's footer), Try it free (the modal and the door, or the mailto: off state), the sample page, the grain, the
-// receipt cards, the pricing toggle and the motion of design_handoff_site/README.md ("Interactions and motion"); with
-// prefers-reduced-motion set, no motion runs and the final state shows. Home's own parts (design_handoff_homepage) come
-// last before the motion: the wordmark's way back to the top, the numbers, lines, walkthrough and trust mock.
+// civiumcre.com — the site's one script. Above: the site's switches. Below: the copy they print, the sign-in link,
+// the Get started window (the overlay on Home and Pricing, and the page /start/), the old pages' parts (the sample
+// page, the grain, the receipt cards and the value bridge, which no page uses now), Pricing's billing toggle, Home's
+// own parts (design_handoff_homepage/README.md: the wordmark's way back to the top, the numbers, lines, walkthrough
+// and trust mock) and the motion; with prefers-reduced-motion set, no motion runs and the first state of each part
+// shows. This script asks the network for nothing: it sets links, builds the window and moves what is on the page.
 (() => {
   'use strict';
   const $ = (sel, el = document) => el.querySelector(sel);
@@ -24,14 +25,8 @@ const CONFIG = {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const ease = 'cubic-bezier(.2,.7,.2,1)';
 
-  // The copy the configuration prints.
-  $$('[data-cta], [data-cta-label]').forEach(el => { el.textContent = CONFIG.CTA_LABEL; });
-  $$('[data-preview-days]').forEach(el => { el.textContent = String(CONFIG.PREVIEW_DAYS); });
-  $$('[data-trial-days]').forEach(el => { el.textContent = String(CONFIG.TRIAL_DAYS); });
-
-  // The trial switch: with TRIAL_ON false, Privacy item 2, the modal's steps 2 and 3, and the "View-only for N days."
-  // half of step 1's note are not rendered, so the note reads "No card needed."
-  if (!CONFIG.TRIAL_ON) $$('[data-trial]').forEach(el => el.remove());
+  // The copy the configuration prints: the words on every button that opens the Get started window.
+  $$('[data-cta]').forEach(el => { el.textContent = CONFIG.CTA_LABEL; });
 
   // The sign-in link: SIGN_IN_LABEL, in the nav's link style before the primary button, when SIGN_IN_URL is set.
   if (CONFIG.SIGN_IN_URL) $$('.header .nav').forEach(nav => {
@@ -41,7 +36,7 @@ const CONFIG = {
     a.textContent = CONFIG.SIGN_IN_LABEL;
     nav.insertBefore(a, $('[data-cta]', nav));
   });
-  // Home: the footer's sign-in link and the header's divider before it follow the same switch.
+  // The footers' sign-in link and the header's divider before it follow the same switch.
   $$('[data-sign-in]').forEach(a => {
     if (!CONFIG.SIGN_IN_URL) { a.remove(); return; }
     a.href = CONFIG.SIGN_IN_URL;
@@ -50,193 +45,177 @@ const CONFIG = {
   });
   if (!CONFIG.SIGN_IN_URL) $$('[data-sign-in-sep]').forEach(el => el.remove());
 
-  // Try it free. Off (PROSPECT_DOOR_URL empty): the HTML's mailto: links stay, same label and look, and the modal is
-  // removed. On: Home's controls open the modal; Pricing, FAQ and 404 link to /#try, which opens it on Home.
-  // Create account (the onboarding, 10/31): with SIGNUP_URL set, every control and the plan button go to the app's sign-up.
-  const flow = $('[data-flow]');
-  if (CONFIG.SIGNUP_URL) {
-    if (flow) flow.remove();
-    $$('[data-cta]').forEach(a => { a.href = CONFIG.SIGNUP_URL; });
-    $$('[data-pay="plan"]').forEach(a => { a.dataset.mail = CONFIG.SIGNUP_URL; });
-  } else if (!CONFIG.PROSPECT_DOOR_URL) {
-    if (flow) flow.remove();
-  } else if (!flow) {
-    $$('[data-cta]').forEach(a => { a.href = '/#try'; });
-  } else {
-    const site = $('[data-site]');
-    const panel = $('[role="dialog"]', flow);
-    const form = $('form', flow);
-    const email = $('input[type="email"]', flow);
-    const send = $('button[type="submit"]', flow);
-    const refusal = $('[data-flow-refusal]', flow);
-    const tiles = $$('[data-tile]', flow);
-    const emptyText = $('.tile-file', tiles[0]).textContent;
-    const files = {};
-    let opener = null;
-    let request = 0;     // bumped on every reset and send; a reply for an older number is ignored
-    let inFlight = 0;
+  // The Get started window (the newer sign-up design: "Get started window" and "Booking view"). Built here once, on
+  // first use, for three places: the overlay on Home and Pricing, the page /start/ (the window alone), and
+  // /start/?embed=1, which the app's demo frames. Framed, the ground is clear, the app previews are left out, every
+  // link opens in the top window, Open the demo only closes, and a close is told to the app and to nobody else.
+  const params = new URLSearchParams(location.search);
+  const startPage = $('[data-gs-page]');
+  const embed = !!startPage && params.get('embed') === '1';
+  const GO = { demo: CONFIG.DEMO_URL, free: CONFIG.FREE_URL, trial: CONFIG.TRIAL_URL, signin: CONFIG.SIGN_IN_URL, pricing: CONFIG.PRICING_URL };
+  const PREVIEW = {   // the app previews: the design's sample app at 1280x800, the screen the design frames in each panel
+    demo: '<div class="gs-preview" aria-hidden="true"><img src="/assets/start/demo-1280.webp" srcset="/assets/start/demo-1280.webp 1280w, /assets/start/demo-1920.webp 1920w" sizes="704px" width="704" height="440" alt="" loading="lazy"></div>',
+    free: '<div class="gs-preview" aria-hidden="true"><img src="/assets/start/free-1280.webp" srcset="/assets/start/free-1280.webp 1280w, /assets/start/free-1920.webp 1920w" sizes="704px" width="704" height="440" alt="" loading="lazy"></div>',
+    trial: '<div class="gs-preview" aria-hidden="true"><img src="/assets/start/trial-1280.webp" srcset="/assets/start/trial-1280.webp 1280w, /assets/start/trial-1920.webp 1920w" sizes="704px" width="704" height="440" alt="" loading="lazy"></div>'
+  };
+  const PANELS = [   // the four ways in: [kind, title, the line under it, the list, the button's words]
+    ['demo', 'Civium Demo', 'Click around one of our deals. See how we underwrite.', [], 'Open the demo'],
+    ['meet', 'Book a meeting', 'A 30-minute call with our team. Talk about your deals and your workflow with us. See how we can help.', [], 'Talk with our team'],
+    ['free', 'Civium Free', 'Start with one deal', ['No card required', 'One deal of your own', 'Comps where Civium already has them'], 'Start free'],
+    ['trial', 'Civium Trial', 'Start with everything', ['Card required', 'Up to five deals over 14 days', 'Sharing and your relationship book', 'Then Civium, at $1,500 a month'], 'Start the trial']
+  ];
+  const TOPICS = {   // the booking view's words, by topic: [the line over the title, the title, the line under it]
+    demo: ['Talk with our team', 'Pick a time with Caden.', '30 minutes on a video call. Bring a deal if you have one.'],
+    team: ['Teams', 'Talk to Caden about your team.', '30 minutes on a video call about seats, setup and pricing for your team.'],
+    custom: ['Civium Custom', 'Civium Custom starts with a call.', 'Civium Custom is Civium plus monthly customizations from your own list, and meetings with Caden. It is priced to what you need. Bring the list.']
+  };
+  const WORDS = {   // the rest of the window's words
+    heading: 'Get started', lead: 'Get familiar with Civium at your pace.', buy: 'Ready to buy →',
+    open: 'No account needed', withAccount: 'With an account',
+    account: 'Already have an account?', signin: 'Client portal →', pricing: 'See pricing →',
+    back: '← All the ways to start', meta: ['30 minutes', 'Video call']
+  };
+  let gs = null;
 
-    // The door's numbers and words, mirrored from the product (civium_prospect.py, civium_drops.py); the door stays
-    // the authority. A file whose name is not a workbook's, or files past these numbers, are refused here in the
-    // door's own words and never sent: a body declared past the door's number meets a wall a page cannot read.
-    const MIB = 1024 * 1024;
-    const FILE_MAX = 40 * MIB;                 // civium_prospect.FILE_MAX (= civium_drops.SIZE_MAX): one file
-    const BODY_MAX = 85 * MIB;                 // civium_prospect.BODY_MAX: the whole body
-    const EXTS = ['.xlsx', '.xlsm', '.xls'];   // civium_drops.EXTS: a workbook, by the end of its name
-    const WORDS = {                            // civium_prospect.WORDS, verbatim, at those numbers
-      too_large: 'the files are too large — the form takes up to 40 MB a file',
-      not_a_workbook: 'send the rent roll as a workbook (.xlsx, .xlsm or .xls)',
-      not_a_statement: 'send the T-12 as a workbook (.xlsx, .xlsm or .xls)'
+  const buildStart = () => {
+    const d = document.createElement('dialog');
+    d.className = 'gs' + (embed ? ' gs--embed' : startPage ? ' gs--alone' : '');
+    d.setAttribute('aria-labelledby', 'gs-title');
+    // A panel's one button: a link into the app, or (Open the demo, framed) a close, or the way to the booking view.
+    const button = (kind, words) => {
+      if (kind === 'demo' && embed) return '<button type="button" class="gs-btn" data-gs-close>' + words + '</button>';
+      if (kind !== 'meet') return '<a class="gs-btn" data-gs-go="' + kind + '">' + words + '</a>';
+      if (CONFIG.SCHEDULER_URL) return '<button type="button" class="gs-btn" data-gs-book="demo">' + words + '</button>';
+      return '<a class="gs-btn" data-gs-mail>' + words + '</a>';
     };
-    const NOT_ITS_KIND = { rent_roll: 'not_a_workbook', t12: 'not_a_statement' };   // civium_prospect.NOT_ITS_KIND
-    // The site's one sentence of its own, for an answer with no words the page can read.
-    const NO_WORDS = 'Civium could not take the files just now — try again in a few minutes.';
+    const pane = ([kind, title, line, items, words]) => '<div class="gs-panel gs-panel--' + kind + '">'
+      + '<div class="gs-panel-ground"></div><div class="gs-panel-grain"></div>'
+      + (embed || !PREVIEW[kind] ? '' : PREVIEW[kind])
+      + '<div class="gs-panel-text"><h3 class="gs-panel-title">' + title + '</h3><p class="gs-panel-line">' + line + '</p>'
+      + (items.length ? '<ul class="gs-list">' + items.map(t => '<li>' + t + '</li>').join('') + '</ul>' : '')
+      + button(kind, words) + '</div><div class="gs-panel-wash"></div></div>';
+    const group = (eyebrow, panels, account) => '<div class="gs-group"><span class="gs-eyebrow">' + eyebrow + '</span>'
+      + '<div class="gs-row' + (account ? ' gs-row--account' : '') + '">' + panels.map(pane).join('') + '</div></div>';
+    d.innerHTML = '<div class="gs-card">'
+      + '<div class="gs-side"><img class="gs-side-photo" src="/assets/photos/home-close-galleria.jpg" width="1600" height="2400" alt="">'
+      + '<div class="gs-side-shade"></div><div class="gs-side-in"><span class="gs-wordmark">CIVIUM</span>'
+      + '<div class="gs-intro" data-gs-view="choose"><h2 class="gs-title" id="gs-title" tabindex="-1">' + WORDS.heading + '</h2>'
+      + '<p class="gs-line">' + WORDS.lead + '</p><a class="gs-buy" data-gs-go="pricing">' + WORDS.buy + '</a></div>'
+      + '<div class="gs-intro gs-intro--book" data-gs-view="book" hidden><span class="gs-eyebrow gs-eyebrow--side" data-gs-topic="eyebrow"></span>'
+      + '<h2 class="gs-title" id="gs-book-title" tabindex="-1" data-gs-topic="title"></h2></div></div></div>'
+      + '<div class="gs-main"><button type="button" class="gs-close" aria-label="Close" data-gs-close>×</button>'
+      + '<div class="gs-choose" data-gs-view="choose">' + group(WORDS.open, PANELS.slice(0, 2)) + group(WORDS.withAccount, PANELS.slice(2), true) + '</div>'
+      + '<div class="gs-foot" data-gs-view="choose"><span data-gs-signin>' + WORDS.account + ' <a class="gs-foot-link" data-gs-go="signin">' + WORDS.signin + '</a></span>'
+      + '<a class="gs-foot-link" data-gs-go="pricing">' + WORDS.pricing + '</a></div>'
+      + '<div class="gs-book" data-gs-view="book" hidden><button type="button" class="gs-back" data-gs-back>' + WORDS.back + '</button>'
+      + '<div class="gs-book-head"><p class="gs-book-sub" data-gs-topic="sub"></p>'
+      + '<div class="gs-book-meta">' + WORDS.meta.map(t => '<span>' + t + '</span>').join('') + '</div></div>'
+      + '<div class="gs-book-frame" data-gs-frame></div></div></div></div>';
+    $$('[data-gs-go]', d).forEach(a => { a.href = GO[a.dataset.gsGo]; });
+    $$('[data-gs-mail]', d).forEach(a => { a.href = CONFIG.TALK_MAIL; });
+    if (!CONFIG.SIGN_IN_URL) $$('[data-gs-signin]', d).forEach(el => el.remove());
+    if (embed) $$('a', d).forEach(a => { a.target = '_top'; });
 
-    const show = n => {
-      $$('[data-step]', flow).forEach(step => { step.hidden = step.dataset.step !== String(n); });
-      const title = $('[data-step="' + n + '"] .flow-title', flow);
-      panel.setAttribute('aria-labelledby', title.id);
-      title.focus();
-    };
-    const setFile = (key, file) => {
-      files[key] = file || null;
-      const tile = tiles.find(t => t.dataset.tile === key);
-      tile.classList.toggle('is-on', !!file);
-      $('.tile-file', tile).textContent = file ? file.name + ' attached' : emptyText;
-    };
-    const say = words => { refusal.textContent = words; refusal.hidden = !words; };   // the line under the button
-    const reset = () => {   // "Closing the modal resets the attached files."
-      request++;
-      inFlight = 0;
-      send.removeAttribute('aria-disabled');
-      tiles.forEach(t => setFile(t.dataset.tile, null));
-      $$('input', flow).forEach(i => { i.value = ''; });
-      say('');
-    };
-    const openFlow = from => {
-      opener = from || null;
-      reset();
-      flow.hidden = false;
-      site.inert = true;
-      show(1);
-    };
-    const closeFlow = () => {
-      if (flow.hidden) return;
-      flow.hidden = true;
-      site.inert = false;
-      reset();
-      if (opener && opener.isConnected) opener.focus();
-      opener = null;
-    };
-
-    // The controls become buttons that open the modal.
-    $$('[data-cta]').forEach(a => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = a.className;
-      b.dataset.cta = '';
-      b.textContent = a.textContent;
-      b.setAttribute('aria-haspopup', 'dialog');
-      b.addEventListener('click', () => openFlow(b));
-      a.replaceWith(b);
+    // Close: the × and, framed, Open the demo; a click outside the window. Esc closes the overlay by itself.
+    d.addEventListener('click', e => {
+      const t = e.target.closest('[data-gs-close], [data-gs-book], [data-gs-back]');
+      if (!t) return;
+      if (t.matches('[data-gs-close]')) closeStart();
+      else if (t.matches('[data-gs-back]')) setView('choose');
+      else setView('book', t.dataset.gsBook);
     });
-
-    // Close: the Close and Done buttons, Escape, and a click outside the panel. Tab and Shift+Tab cycle inside it.
-    $$('[data-flow-close]', flow).forEach(b => b.addEventListener('click', closeFlow));
     let downOutside = false;
-    flow.addEventListener('mousedown', e => { downOutside = e.target === flow; });
-    flow.addEventListener('click', e => { if (e.target === flow && downOutside) closeFlow(); });
-    document.addEventListener('keydown', e => {
-      if (flow.hidden) return;
-      if (e.key === 'Escape') { e.preventDefault(); closeFlow(); return; }
-      if (e.key !== 'Tab') return;
-      const stops = $$('button, [href], input, select, textarea', panel).filter(el => !el.disabled && el.getClientRects().length);
-      if (!stops.length) return;
-      e.preventDefault();
-      const at = document.activeElement, n = stops.length, i = stops.indexOf(at);
-      let to;
-      if (i !== -1) to = stops[(i + (e.shiftKey ? n - 1 : 1)) % n];
-      else if (!panel.contains(at)) to = e.shiftKey ? stops[n - 1] : stops[0];
-      else {   // on a step title: the next stop after it, or the one before it, wrapping
-        const ahead = stops.filter(s => at.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_FOLLOWING);
-        const behind = stops.filter(s => at.compareDocumentPosition(s) & Node.DOCUMENT_POSITION_PRECEDING);
-        to = e.shiftKey ? (behind.length ? behind[behind.length - 1] : stops[n - 1]) : (ahead.length ? ahead[0] : stops[0]);
-      }
-      to.focus();
-    });
+    d.addEventListener('mousedown', e => { downOutside = e.target === d; });
+    d.addEventListener('click', e => { if (e.target === d && downOutside) closeStart(); });
+    d.addEventListener('close', closed);   // Esc closes the overlay without passing through closeStart
 
-    // The upload tiles: choose a file or drop one; a drop anywhere else on the overlay does nothing. A file whose name
-    // does not end in one of EXTS is not attached: the door's words for its part show under the button.
-    tiles.forEach(tile => {
-      const key = tile.dataset.tile;
-      const input = $('input[data-file="' + key + '"]', flow);
-      const choose = file => {
-        const ok = !file || EXTS.some(x => file.name.toLowerCase().endsWith(x));
-        setFile(key, ok ? file : null);
-        say(ok ? '' : WORDS[NOT_ITS_KIND[key]]);
-        if (!ok) input.value = '';   // so the same file chosen again is judged again
-      };
-      tile.addEventListener('click', () => input.click());
-      input.addEventListener('change', () => choose(input.files[0]));
-      tile.addEventListener('drop', e => { const f = e.dataTransfer && e.dataTransfer.files[0]; if (f) choose(f); });
+    // A panel widens while the pointer is on it or the keyboard is inside it, and its neighbour dims.
+    const hold = (row, panel) => $$('.gs-panel', row).forEach(p => {
+      p.classList.toggle('is-on', p === panel);
+      p.classList.toggle('is-dim', !!panel && p !== panel);
     });
-    flow.addEventListener('dragover', e => e.preventDefault());
-    flow.addEventListener('drop', e => e.preventDefault());
+    const into = e => { const p = e.target.closest('.gs-panel'); if (p) hold(p.parentElement, p); };
+    const outOf = e => {
+      const p = e.target.closest('.gs-panel');
+      if (!p) return;
+      const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.gs-panel') : null;
+      if (to && to.parentElement === p.parentElement) return;
+      hold(p.parentElement, null);
+    };
+    if (window.matchMedia('(hover: hover)').matches) { d.addEventListener('mouseover', into); d.addEventListener('mouseout', outOf); }
+    d.addEventListener('focusin', into);
+    d.addEventListener('focusout', outOf);
+    return d;
+  };
 
-    // Step 1 sends to the prospect door: multipart email, rent_roll, t12; no cookie. Files past the door's numbers are
-    // not sent; its too_large words show instead. Accepted (202): step 2 (or, with the trial off, the modal closes).
-    // Any other answer: the door's own words when it carries them (4xx or 5xx), else NO_WORDS. The button works again.
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      if (inFlight) return;
-      const chosen = [files.rent_roll, files.t12].filter(Boolean);
-      if (chosen.some(f => f.size > FILE_MAX) || chosen.reduce((sum, f) => sum + f.size, 0) > BODY_MAX) {
-        say(WORDS.too_large);
-        return;
+  // The booking view: its frame is made, and the scheduler's page asked for, only when the view first opens.
+  const setView = (view, topic) => {
+    const book = view === 'book' && !!CONFIG.SCHEDULER_URL;
+    const t = TOPICS[topic] || TOPICS.demo;
+    $$('[data-gs-view]', gs).forEach(el => { el.hidden = (el.dataset.gsView === 'book') !== book; });
+    gs.setAttribute('aria-labelledby', book ? 'gs-book-title' : 'gs-title');
+    if (book) {
+      $$('[data-gs-topic]', gs).forEach(el => { el.textContent = { eyebrow: t[0], title: t[1], sub: t[2] }[el.dataset.gsTopic]; });
+      let frame = $('[data-gs-frame] iframe', gs);
+      if (!frame) {
+        frame = document.createElement('iframe');
+        frame.src = CONFIG.SCHEDULER_URL;
+        $('[data-gs-frame]', gs).appendChild(frame);
       }
-      const mine = ++request;
-      inFlight = mine;
-      send.setAttribute('aria-disabled', 'true');
-      say('');
-      const body = new FormData();
-      body.append('email', email.value.trim());
-      if (files.rent_roll) body.append('rent_roll', files.rent_roll);
-      if (files.t12) body.append('t12', files.t12);
-      let accepted = false, words = '';
-      try {
-        // The door's three traps: a header set by hand, or an upload-progress listener, makes the browser preflight
-        // the post, and the door answers a preflight with a 405; credentials: 'include' hides the door's 202. So this
-        // post sends the form data alone and omits credentials; tools/check_site.sh holds all three.
-        const res = await fetch(CONFIG.PROSPECT_DOOR_URL, { method: 'POST', body, mode: 'cors', credentials: 'omit' });
-        accepted = res.status === 202;
-        if (res.status >= 400 && res.status < 600) {
-          const data = await res.json().catch(() => null);
-          const said = data && data.detail && data.detail.rejected;
-          if (typeof said === 'string' && said.trim()) words = said;
-        }
-      } catch (err) {
-        // No answer the page can read: a blocked one (the wall's 413 carries no allow header) or a failed network.
-      }
-      if (mine !== request) return;   // closed or reset while the door answered
-      inFlight = 0;
-      send.removeAttribute('aria-disabled');
-      if (accepted) { if (CONFIG.TRIAL_ON) show(2); else closeFlow(); return; }
-      say(words || NO_WORDS);   // never a status number, a URL or a stack
-    });
-
-    if (location.hash === '#try') {   // from Pricing, FAQ or 404: drop the fragment so it cannot pull focus back out
-      history.replaceState(null, '', location.pathname + location.search);
-      openFlow($('.header [data-cta]'));
+      frame.title = t[1];
     }
-  }
+    if (!gs.open) return;
+    gs.scrollTop = 0;
+    $(book ? '#gs-book-title' : '#gs-title', gs).focus({ preventScroll: true });
+  };
+  const openStart = (view, topic) => {
+    if (!gs) { gs = buildStart(); document.body.appendChild(gs); }
+    if (!gs.open) {
+      if (startPage) { startPage.hidden = true; gs.show(); }
+      else { lockScroll(true); gs.showModal(); }
+    }
+    setView(view, topic);
+  };
+  const closeStart = () => {
+    if (embed) { window.parent.postMessage({ civium: 'gs-close' }, CONFIG.APP_ORIGIN); setView('choose'); return; }
+    if (startPage) { location.href = '/'; return; }
+    gs.close();
+    closed();
+  };
+  // After the overlay closes, however it closed: the page scrolls again, and ?start=1 leaves the address.
+  const closed = () => {
+    lockScroll(false);
+    if (params.get('start') === '1') history.replaceState(null, '', location.pathname + location.hash);
+  };
+  // The page behind stays where it was while the overlay is open.
+  const lockScroll = on => {
+    const root = document.documentElement;
+    root.style.paddingRight = on ? (window.innerWidth - root.clientWidth) + 'px' : '';
+    root.style.overflow = on ? 'hidden' : '';
+  };
+
+  // Every Get started button opens the window; the booking buttons open its booking view, or write to TALK_MAIL
+  // while there is no scheduler. Each stays a plain link too, for a new tab or a page without this script.
+  const plain = e => e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button;
+  $$('[data-cta]').forEach(a => {
+    a.setAttribute('aria-haspopup', 'dialog');
+    a.addEventListener('click', e => { if (plain(e)) return; e.preventDefault(); openStart('choose'); });
+  });
+  $$('[data-book]').forEach(a => {
+    if (!CONFIG.SCHEDULER_URL) { a.href = CONFIG.TALK_MAIL; return; }
+    a.href = '/start/?view=book&topic=' + a.dataset.book;
+    a.setAttribute('aria-haspopup', 'dialog');
+    a.addEventListener('click', e => { if (plain(e)) return; e.preventDefault(); openStart('book', a.dataset.book); });
+  });
+  $$('[data-go]').forEach(a => { a.href = GO[a.dataset.go]; });   // Pricing's Start free and Start the trial
+  if (startPage) {
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStart(); });
+    openStart(params.get('view'), params.get('topic'));
+  } else if (params.get('start') === '1' && $('[data-cta]')) openStart(params.get('view'), params.get('topic'));
 
   // The sample page: one <template>, cloned into each slot (the hero stage and The record).
   const sample = $('#sample-page');
   if (sample) $$('[data-sample-slot]').forEach(slot => slot.appendChild(sample.content.cloneNode(true)));
-
-  // The hero image: Caden's file when configured; until then the dark fill shows.
-  const photo = $('[data-hero-photo]');
-  if (photo && CONFIG.HERO_IMAGE) photo.src = CONFIG.HERO_IMAGE;
 
   // The film grain: the README's inline SVG noise, applied to [data-grain] elements.
   const svg = "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(#n)'/></svg>";
@@ -262,25 +241,20 @@ const CONFIG = {
     if (!reduced) setInterval(() => { if (!userSrc) { src = src === 'noi' ? 'cap' : 'noi'; show(); } }, 3600);
   }
 
-  // Pricing: the billing toggle (two buttons with aria-pressed); Yearly is the default. The plan buttons
-  // ([data-pay]) open Stripe's Payment Links from CONFIG when those are set — the yearly or the monthly link follows
-  // the toggle, the deal link stands alone; an empty link leaves the button the mailto: it was written with.
+  // Pricing: the Monthly / Yearly toggle on the Civium card (two buttons with aria-pressed; Monthly is the default).
+  // It swaps the price, its unit and the line under it, and Start Civium's address: Yearly adds interval=year.
   const billing = $$('[data-billing]');
-  const payButtons = $$('[data-pay]');
-  const setPay = mode => payButtons.forEach(a => {
-    a.dataset.mail = a.dataset.mail || a.getAttribute('href');
-    const link = a.dataset.pay === 'deal' ? CONFIG.PAY_LINK_DEAL
-      : (mode === 'yearly' ? CONFIG.PAY_LINK_YEARLY : CONFIG.PAY_LINK_MONTHLY);
-    if (link) { a.href = link; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
-    else { a.href = a.dataset.mail; a.removeAttribute('target'); a.removeAttribute('rel'); }
-  });
-  setPay('yearly');
-  billing.forEach(b => b.addEventListener('click', () => {
-    const mode = b.dataset.billing;
-    billing.forEach(o => o.setAttribute('aria-pressed', String(o === b)));
-    $$('[data-yearly]').forEach(el => { el.textContent = el.dataset[mode]; });
-    setPay(mode);
-  }));
+  const setBilling = mode => {
+    billing.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.billing === mode)));
+    $$('[data-monthly]').forEach(el => { el.textContent = el.dataset[mode]; });
+    $$('[data-go="civium"]').forEach(a => {
+      const u = new URL(CONFIG.CIVIUM_URL);
+      if (mode === 'yearly') u.searchParams.set('interval', 'year');
+      a.href = u.href;
+    });
+  };
+  if (billing.length || $('[data-go="civium"]')) setBilling('monthly');
+  billing.forEach(b => b.addEventListener('click', () => setBilling(b.dataset.billing)));
 
   // The value bridge: rows 520ms apart, each fading and rising 10px over 600ms; each bar grows over 900ms while
   // its number counts up from 0 (ease-out cubic). Plays once at 35% visible; Replay runs it again.
