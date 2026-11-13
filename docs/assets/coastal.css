@@ -266,12 +266,14 @@ html:has(body.coastal), body.coastal { background: var(--coastal-paper); }
 .pr-list li:last-child { border-bottom: 1px solid var(--coastal-hair); }
 .pr-own-title { font: 600 clamp(20px,1.6cqw,23px)/1.25 var(--coastal-serif); margin: 0; }
 .pr-own-body { font: 400 16px/1.6 var(--coastal-sans); color: var(--coastal-soft); margin: 10px 0 0; text-wrap: pretty; }
+/* The four cards' parts sit on the same lines: each card spans seven shared rows (name, line, toggle slot, price,
+   note, list, button), so a line that wraps in one card moves that part down in all four. The design holds each part
+   with a fixed height instead, and its prices fall out of line once a card's line wraps. */
 @supports (grid-template-rows: subgrid) {
   .pr-plans { grid-template-rows: repeat(7, auto); row-gap: 0; }
   .pr-plan { display: grid; grid-row: span 7; grid-template-columns: minmax(0,1fr); grid-template-rows: subgrid; margin-bottom: clamp(14px,1.4cqw,20px); }
   .pr-plans { margin-bottom: calc(-1 * clamp(14px,1.4cqw,20px)); }
   .pr-term { min-height: 38px; }
-  .pr-alt, .pr-sub { min-height: 0; }
   .coastal .h-root .pr-btn { margin-top: 0; align-self: end; }
 }
 
@@ -295,7 +297,9 @@ html.gs-root, html.gs-root body { background: transparent; }
 .gs::backdrop { background: transparent; }
 .gs--alone { background: linear-gradient(var(--coastal-start-ground), var(--coastal-start-ground)), var(--coastal-paper); }
 .gs-card { position: relative; width: min(100%,1400px); height: max-content; margin: auto 0; display: flex; flex-wrap: wrap; background: var(--coastal-card); border-radius: 4px; overflow: hidden; box-shadow: var(--coastal-shadow-start); }
-.gs-side { position: relative; flex: .72 1 260px; min-height: 300px; background: var(--coastal-night); }
+/* The photo and the panel share the row .72 to 2, as designed. The two numbers are written as 72 and 200 so that the
+   photo, once it stacks on top (below about 820px of card), spans the whole card: a share under 1 would stop short. */
+.gs-side { position: relative; flex: 72 1 260px; min-height: 300px; background: var(--coastal-night); }
 .gs-side-photo { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
 .gs-side-shade { position: absolute; inset: 0; background: var(--coastal-start-shade); }
 .gs-side-in { position: relative; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 48px; padding: clamp(26px,3vw,44px); color: var(--coastal-ondeep); }
@@ -308,7 +312,7 @@ html.gs-root, html.gs-root body { background: transparent; }
 .gs .gs-buy:hover { transform: scale(1.12); color: var(--coastal-white); }
 .gs-eyebrow { font: 600 11.5px/1 var(--coastal-sans); letter-spacing: .14em; text-transform: uppercase; color: var(--coastal-metal); }
 .gs-eyebrow--side { color: inherit; }
-.gs-main { position: relative; flex: 2 1 560px; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; padding: clamp(26px,3vw,40px) clamp(20px,2.6vw,40px) clamp(20px,2.2vw,28px); }
+.gs-main { position: relative; flex: 200 1 560px; min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; padding: clamp(26px,3vw,40px) clamp(20px,2.6vw,40px) clamp(20px,2.2vw,28px); }
 .gs-close { position: absolute; top: 14px; right: 14px; z-index: 5; width: 36px; height: 36px; padding: 0; border: 1px solid var(--coastal-hair-20); border-radius: 50%; background: var(--coastal-card); font: 400 18px/1 system-ui, sans-serif; color: var(--coastal-soft); cursor: pointer; }
 .gs-close:hover { border-color: var(--coastal-ink); color: var(--coastal-ink); }
 .gs-choose { display: flex; flex-direction: column; gap: clamp(22px,3.4vh,34px); }
@@ -328,8 +332,6 @@ html.gs-root, html.gs-root body { background: transparent; }
 .gs-panel-grain { background-image: image-set(url(start/grain-240.webp) 1x, url(start/grain-480.webp) 2x); background-size: 240px 240px; }
 .gs-panel-text { position: relative; z-index: 2; flex: 1; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; max-width: 310px; padding: 26px 28px; }
 .gs-panel--meet .gs-panel-text { max-width: 340px; }
-.gs-panel--trial .gs-panel-text { max-width: 320px; }
-.gs-panel--trial .gs-panel-text > span, .gs-panel--trial .gs-panel-text > ul { max-width: 300px; }
 .gs-panel-title { font: 600 clamp(26px,2.1vw,32px)/1.12 var(--coastal-serif); margin: 0; }
 .gs-panel-line { font: 400 15.5px/1.55 var(--coastal-sans); color: var(--coastal-ondeep2); margin: 0; text-wrap: pretty; }
 .gs-row--account .gs-panel-text { gap: 8px; }
