@@ -1,0 +1,8 @@
+# The product's prototype (the client app, its sample data and its math). Read it and run it on this machine; never
+# commit it. This repo publishes civiumcre.com and holds nothing confidential.
+prototype/
+# The screenshot tool's install.
+capture/node_modules/
+capture/package-lock.json
+# The design tool's preview of this build.
+preview/

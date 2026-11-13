@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "description": "Captures the app screenshots the civiumcre.com homepage shows (design_handoff_homepage/README.md)",
+  "scripts": {
+    "capture": "node capture-app-shots.cjs ../../docs/assets/app"
+  },
+  "devDependencies": {
+    "playwright": "^1.48.0"
+  }
+}
