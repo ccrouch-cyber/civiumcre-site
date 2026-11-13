@@ -13,9 +13,10 @@ const CONFIG = {
 };
 
 // civiumcre.com — the site's one script. Above: Caden's switches. Below: the copy they print, the trial switch,
-// the sign-in link, Try it free (the modal and the door, or the mailto: off state), the sample page, the grain, the
+// the sign-in link (the header's, and Home's footer), Try it free (the modal and the door, or the mailto: off state), the sample page, the grain, the
 // receipt cards, the pricing toggle and the motion of design_handoff_site/README.md ("Interactions and motion"); with
-// prefers-reduced-motion set, no motion runs and the final state shows.
+// prefers-reduced-motion set, no motion runs and the final state shows. Home's own parts (design_handoff_homepage) come
+// last before the motion: the wordmark's way back to the top, the numbers, lines, walkthrough and trust mock.
 (() => {
   'use strict';
   const $ = (sel, el = document) => el.querySelector(sel);
@@ -40,6 +41,14 @@ const CONFIG = {
     a.textContent = CONFIG.SIGN_IN_LABEL;
     nav.insertBefore(a, $('[data-cta]', nav));
   });
+  // Home: the footer's sign-in link and the header's divider before it follow the same switch.
+  $$('[data-sign-in]').forEach(a => {
+    if (!CONFIG.SIGN_IN_URL) { a.remove(); return; }
+    a.href = CONFIG.SIGN_IN_URL;
+    a.textContent = CONFIG.SIGN_IN_LABEL;
+    a.hidden = false;
+  });
+  if (!CONFIG.SIGN_IN_URL) $$('[data-sign-in-sep]').forEach(el => el.remove());
 
   // Try it free. Off (PROSPECT_DOOR_URL empty): the HTML's mailto: links stay, same label and look, and the modal is
   // removed. On: Home's controls open the modal; Pricing, FAQ and 404 link to /#try, which opens it on Home.
@@ -305,6 +314,210 @@ const CONFIG = {
     });
   };
 
+  // Home (design_handoff_homepage/README.md): the live numbers, the opening's lines and motion, the walkthrough and
+  // the trust mock. Everything that moves checks reduced; with it set, each part shows its first state and clicks work.
+  const homeRoot = $('.h-open') ? $('.h-root') : null;
+  if (homeRoot) {
+    const hEase = 'cubic-bezier(.22,.61,.24,1)';
+    const turn = (el, yes) => el.classList.toggle('is-on', yes);
+
+    // The wordmark: on Home it goes back to the top instead of reloading the page, and drops a #fragment.
+    const mark = $('.h-open .wordmark');
+    if (mark) mark.addEventListener('click', e => {
+      e.preventDefault();
+      if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+      window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    });
+    const load = img => {   // a screen held in data-src / data-srcset until its step comes up
+      if (!img || !img.dataset.src) return;
+      if (img.dataset.srcset) img.srcset = img.dataset.srcset;
+      img.src = img.dataset.src;
+      delete img.dataset.src;
+      delete img.dataset.srcset;
+    };
+
+    // The live numbers: window.CIVIUM_STATS from /assets/stats.js. A missing, zero or non-number value keeps the dash
+    // and "Not yet measured".
+    const stats = window.CIVIUM_STATS || {};
+    const statKey = { minutes: 'minutesAvg', dollars: 'dollarsUnderwritten' };
+    const money = (v, d, unit) => '$' + (v / d).toFixed(v / d < 10 && unit === 'B' ? 1 : 0).replace(/\.0$/, '') + unit;
+    const statText = {
+      minutes: v => String(Math.round(v)),
+      dollars: v => v >= 1e9 ? money(v, 1e9, 'B') : v >= 1e6 ? money(v, 1e6, 'M') : money(v, 1e3, 'K')
+    };
+    $$('[data-stat]', homeRoot).forEach(el => {
+      const k = el.dataset.stat, v = stats[statKey[k]];
+      if (typeof v !== 'number' || !isFinite(v) || v <= 0) return;
+      const num = $('.h-stat-num', el), pill = $('.h-pill', el);
+      num.textContent = statText[k](v);
+      num.classList.remove('is-empty');
+      if (pill) pill.remove();
+    });
+
+    // The opening's lines: 60 curves across a 1600x700 field, drawn once (styled by home.css).
+    const lines = $('[data-lines]', homeRoot);
+    if (lines) {
+      const W = 1600, H = 700;
+      const curve = (i, dir) => {
+        let d = '';
+        for (let x = 0; x <= W; x += 8) {
+          const amp = 70 + 34 * Math.sin(i * .27 + dir);
+          const y = H * .52 + Math.sin(x / 240 + dir * i * .17) * amp * Math.cos(x / 760 - i * .04 * dir) + (i - 15) * 6.5;
+          d += (x ? 'L' : 'M') + x + ' ' + y.toFixed(1);
+        }
+        return '<path d="' + d + '"></path>';
+      };
+      let paths = '';
+      for (let i = 0; i < 30; i++) paths += curve(i, 1);
+      for (let i = 0; i < 30; i++) paths += curve(i, -1);
+      lines.innerHTML = '<svg viewBox="0 0 1600 700" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><g>' + paths + '</g></svg>';
+    }
+
+    // The trust mock is a 760x540 canvas, scaled to its box's width.
+    const mock = $('[data-mock]', homeRoot);
+    if (mock) {
+      const canvas = mock.firstElementChild;
+      const fit = () => { canvas.style.transform = 'scale(' + (mock.clientWidth / 760) + ')'; };
+      fit();
+      new ResizeObserver(fit).observe(mock);
+    }
+
+    // The opening: entrance, the photo's and the lines' slow drift, the two app screens 8s apart, the headline's
+    // last word every 3.8s. The close's photo drifts the other way.
+    if (!reduced) {
+      $$('[data-in]', homeRoot).forEach(el => {
+        const frame = el.hasAttribute('data-in-frame');
+        el.animate([{ opacity: 0, transform: 'translateY(' + (frame ? 40 : 18) + 'px)' }, { opacity: 1, transform: 'none' }],
+          { duration: frame ? 1500 : 1100, delay: +(el.dataset.in || 0), easing: hEase, fill: 'backwards' });
+      });
+      const svg = lines && $('svg', lines);
+      if (svg) svg.animate([{ transform: 'translateX(-60px)' }, { transform: 'translateX(60px)' }],
+        { duration: 26000, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' });
+      const drift = (sel, to, ms) => {
+        const el = $(sel, homeRoot);
+        if (el) el.animate([{ transform: 'scale(1) translateX(0)' }, { transform: to }],
+          { duration: ms, direction: 'alternate', iterations: Infinity, easing: 'ease-in-out' });
+      };
+      drift('[data-drift="open"]', 'scale(1.07) translateX(-1.6%)', 32000);
+      drift('[data-drift="close"]', 'scale(1.06) translateX(1.4%)', 34000);
+      const shots = $$('[data-shot]', homeRoot);
+      if (shots.length > 1) {
+        let k = 0;
+        setInterval(() => { k = (k + 1) % shots.length; shots.forEach((s, j) => turn(s, j === k)); }, 8000);
+      }
+      const word = $('[data-word]', homeRoot);
+      const WORDS = ['multifamily', 'brokers', 'buyers', 'lenders'];
+      if (word) {
+        let w = 0;
+        setInterval(() => {
+          w = (w + 1) % WORDS.length;
+          const out = word.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-.18em)' }],
+            { duration: 420, easing: 'ease-in', fill: 'forwards' });
+          out.onfinish = () => {
+            word.textContent = WORDS[w];
+            out.cancel();
+            word.animate([{ opacity: 0, transform: 'translateY(.18em)' }, { opacity: 1, transform: 'none' }], { duration: 700, easing: hEase });
+          };
+        }, 3800);
+      }
+    }
+
+    // A week of underwriting: the step and its screen. Once 20% of the section is in view the steps advance every
+    // 6.5s; a click shows that step and restarts the count. Step 1 drops two files in. The next screen loads 2.5s early.
+    const steps = $$('[data-walk-step]', homeRoot), frames = $$('[data-walk-frame]', homeRoot), chips = $$('[data-walk-chip]', homeRoot);
+    if (steps.length) {
+      let cur = 0, walk = 0;
+      const go = i => {
+        cur = i;
+        steps.forEach((s, j) => { turn(s, j === i); s.setAttribute('aria-pressed', String(j === i)); });
+        frames.forEach((f, j) => { if (j === i) load(f); turn(f, j === i); });
+        if (i === 0 && !reduced) chips.forEach((c, n) => {
+          c.getAnimations().forEach(x => x.cancel());
+          c.animate([
+            { opacity: 0, transform: 'translate(260px,-150px) rotate(5deg)' },
+            { opacity: 1, offset: .18 },
+            { opacity: 1, transform: 'translate(0,0) rotate(0)', offset: .62 },
+            { opacity: 1, transform: 'scale(.94)', offset: .8 },
+            { opacity: 0, transform: 'scale(.9)' }
+          ], { duration: 3000, delay: 700 + n * 450, easing: 'cubic-bezier(.3,.7,.2,1)', fill: 'both' });
+        });
+        setTimeout(() => load(frames[(i + 1) % frames.length]), 2500);
+      };
+      const run = () => { clearInterval(walk); if (!reduced) walk = setInterval(() => go((cur + 1) % steps.length), 6500); };
+      const seen = new IntersectionObserver(es => {
+        if (es.some(e => e.isIntersecting)) { seen.disconnect(); go(0); run(); }
+      }, { threshold: .2 });
+      seen.observe(steps[0].closest('section'));
+      steps.forEach((s, i) => s.addEventListener('click', () => { seen.disconnect(); go(i); run(); }));
+    }
+
+    // Underwriting you can defend: a cursor moves to a number and clicks it; the number's sources open. Three examples,
+    // 7.5s each, once 30% of the mock is in view; a click on an example plays it and restarts the count.
+    const trace = $('[data-trace]', homeRoot);
+    if (trace) {
+      const canvas = $('.h-mock-in', trace), cursor = $('[data-cursor]', trace);
+      const scenes = $$('[data-scene]', trace), tabs = $$('[data-tab]', trace), pops = $$('[data-pop]', trace), picks = $$('[data-pick]', trace);
+      const TAB = [3, 0, 1], DUR = 7500;   // the tab each example lights: Pro Forma, Rent Roll Analyzer, T-12 Analyzer
+      let at = 0, from = null, loop = 0, waits = [];
+      const set = i => {
+        at = i;
+        scenes.forEach((s, j) => { turn(s, j === i); const t = $('[data-target]', s); if (t) t.classList.remove('is-hit'); });
+        tabs.forEach((t, j) => turn(t, j === TAB[i]));
+        pops.forEach(p => { p.getAnimations().forEach(x => x.cancel()); p.classList.remove('is-open'); });
+        picks.forEach((p, j) => {
+          turn(p, j === i);
+          p.setAttribute('aria-pressed', String(j === i));
+          const bar = $('[data-pick-bar]', p);
+          bar.getAnimations().forEach(x => x.cancel());
+          bar.style.transform = j === i && reduced ? 'scaleX(1)' : 'scaleX(0)';
+        });
+        if (!reduced) $('[data-pick-bar]', picks[i]).animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
+          { duration: DUR, easing: 'linear', fill: 'forwards' });
+      };
+      const open = (i, anim) => {
+        const t = $('[data-target]', scenes[i]);
+        if (t) t.classList.add('is-hit');
+        const p = pops[i];
+        p.classList.add('is-open');
+        if (!anim) return;
+        p.animate([{ opacity: 0, transform: 'translateY(10px) scale(.985)' }, { opacity: 1, transform: 'none' }], { duration: 500, easing: hEase });
+        $$('[data-pop-row]', p).forEach((r, k) => r.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 450, delay: 300 + k * 280, easing: hEase, fill: 'backwards' }));
+      };
+      const play = i => {
+        waits.forEach(clearTimeout);
+        waits = [];
+        set(i);
+        if (reduced) { open(i, false); return; }
+        const box = canvas.getBoundingClientRect(), s = box.width / 760 || 1;
+        const r = $('[data-target] [data-value]', scenes[i]).getBoundingClientRect();
+        const x = (r.left - box.left) / s + r.width / s * .6, y = (r.top - box.top) / s + r.height / s * .7;
+        const f = from || { x: x + 200, y: y + 220 };
+        cursor.getAnimations().forEach(z => z.cancel());
+        cursor.animate([{ opacity: from ? 1 : 0, transform: 'translate(' + f.x + 'px,' + f.y + 'px)' },
+          { opacity: 1, transform: 'translate(' + x + 'px,' + y + 'px)' }],
+          { duration: 1000, delay: 500, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'both' });
+        from = { x, y };
+        waits.push(setTimeout(() => {
+          const pos = 'translate(' + x + 'px,' + y + 'px)';
+          cursor.animate([{ transform: pos + ' scale(1)' }, { transform: pos + ' scale(.82)' }, { transform: pos + ' scale(1)' }], { duration: 260 });
+          open(i, true);
+        }, 1600));
+      };
+      const cycle = () => { clearInterval(loop); loop = setInterval(() => play((at + 1) % scenes.length), DUR); };
+      set(0);
+      open(0, false);
+      let seen = null;
+      if (!reduced) {
+        seen = new IntersectionObserver(es => {
+          if (es.some(e => e.isIntersecting)) { seen.disconnect(); play(0); cycle(); }
+        }, { threshold: .3 });
+        seen.observe(trace);
+      }
+      picks.forEach((p, i) => p.addEventListener('click', () => { if (seen) seen.disconnect(); play(i); if (!reduced) cycle(); }));
+    }
+  }
+
   if (reduced) return;   // Everything below is motion.
 
   // Hero entrance.
@@ -344,16 +557,24 @@ const CONFIG = {
     });
   }
 
-  // Scroll reveals: [data-rise="delayMs"] fades in and rises 24px over 900ms the first time 12% of it is in view.
+  // Scroll reveals: [data-rise="delayMs"] fades in and rises the first time 12% of it is in view: 24px over 900ms, or on
+  // Home 26px over 1100ms on the home easing, leaving alone what is already scrolled past. Printing shows them all.
+  const isHome = !!$('.h-open');
+  const riseBy = isHome ? 26 : 24, riseMs = isHome ? 1100 : 900, riseEase = isHome ? 'cubic-bezier(.22,.61,.24,1)' : ease;
   const rise = new IntersectionObserver(entries => entries.forEach(en => {
     if (!en.isIntersecting) return;
     rise.unobserve(en.target);
     const el = en.target;
     el.style.opacity = '';
-    el.animate([{ opacity: 0, transform: 'translateY(24px)' }, { opacity: 1, transform: 'none' }],
-      { duration: 900, delay: +(el.dataset.rise || 0), easing: ease, fill: 'backwards' });
+    el.animate([{ opacity: 0, transform: 'translateY(' + riseBy + 'px)' }, { opacity: 1, transform: 'none' }],
+      { duration: riseMs, delay: +(el.dataset.rise || 0), easing: riseEase, fill: 'backwards' });
   }), { threshold: .12 });
-  $$('[data-rise]').forEach(el => { el.style.opacity = '0'; rise.observe(el); });
+  $$('[data-rise]').forEach(el => {
+    if (isHome && el.getBoundingClientRect().bottom < 0) return;
+    el.style.opacity = '0';
+    rise.observe(el);
+  });
+  window.addEventListener('beforeprint', () => $$('[data-rise]').forEach(el => { el.style.opacity = ''; }));
 
   // The value bridge plays once when 35% of the card is visible; Replay is shown only where motion runs.
   const bridge = $('[data-bridge]');

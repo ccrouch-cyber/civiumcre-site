@@ -3,264 +3,199 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Civium</title>
-<meta name="description" content="What the property you’re pitching is worth today and where the upside is, back in minutes. Underwritten the way the buy side does it, with every number traced to its source.">
+<title>Civium · The underwriting desk for multifamily</title>
+<meta name="description" content="Civium underwrites a multifamily deal in minutes, so brokers, buyers and lenders price it right the first time.">
 <link rel="icon" href="data:,">
+<link rel="preload" href="/assets/fonts/source-serif-4-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tokens.css">
 <link rel="stylesheet" href="/assets/system.css">
 <link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/coastal.css">
 </head>
-<body>
-<div class="site" data-site>
+<body class="coastal">
+<div class="site h-root" data-site>
 <main>
 
-  <!-- 1. Hero (dark), with the header on it -->
-  <section class="hero">
-    <div class="grain" data-grain></div>
-    <div class="hero-glow"></div>
-    <div class="hero-inner">
-      <header class="header header--dark">
+  <!-- 1. Opening: the photo band under the coastal wash, the header on it, the headline, the app (two screens) -->
+  <section class="h-open">
+    <div class="h-open-photo">
+      <div class="h-drift" data-drift="open"><img class="h-photo" src="/assets/photos/home-hero.jpg" alt="" fetchpriority="high" data-hero-photo></div>
+      <div class="h-open-wash"></div>
+      <div class="h-lines" data-lines></div>
+    </div>
+    <div class="h-open-inner">
+      <header class="header h-header">
         <a class="wordmark" href="/">CIVIUM</a>
         <nav class="nav">
           <a class="nav-link" href="#how">How it works</a>
           <a class="nav-link" href="/pricing/">Pricing</a>
           <a class="nav-link" href="/faq/">FAQ</a>
-          <a class="btn btn--nav" href="mailto:deals@civiumcre.com" data-cta></a>
+          <span class="h-sep" aria-hidden="true" data-sign-in-sep></span>
+          <a class="h-btn h-btn--nav" href="mailto:deals@civiumcre.com" data-cta>Create account</a>
         </nav>
       </header>
-      <div class="hero-grid">
-        <div data-rise="0">
-          <div class="eyebrow eyebrow--hero">Caden Crouch · Austin, Texas</div>
-          <h1 class="hero-title">Institutional underwriting for Texas multifamily.</h1>
-          <p class="hero-lead">What the property you’re pitching is worth today and where the upside is, back in minutes. Underwritten the way the buy side does it, with every number traced to its source.</p>
-          <div class="hero-actions">
-            <a class="btn btn--hero" href="mailto:deals@civiumcre.com" data-cta></a>
-            <a class="sample-link" href="#value">See a sample page</a>
-          </div>
-          <div class="hero-note">Two files in. No card to start.</div>
+      <div class="h-open-copy">
+        <h1 class="h-h1" data-in="0" aria-label="The underwriting desk for multifamily.">The underwriting desk<br>for <span class="h-word" data-word>multifamily</span>.</h1>
+        <div class="h-open-lead" data-in="140">
+          <p>Civium underwrites a multifamily deal in minutes, so brokers, buyers and lenders price it right the first time.</p>
+          <div class="h-actions"><a class="h-btn" href="mailto:deals@civiumcre.com" data-cta>Create account</a></div>
         </div>
-        <div class="stage" data-stage>
-          <div class="layer layer--image">
-            <div class="hero-frame">
-              <div class="hero-img" data-hero-img>
-                <img class="hero-photo" alt="Building render or still" data-hero-photo>
-              </div>
-              <div class="sweep" data-sweep></div>
-              <div class="shade"></div>
-              <div class="grain grain--image" data-grain></div>
-            </div>
-          </div>
-          <div class="layer layer--page">
-            <div class="hero-page" data-hero-page data-sample-slot></div>
-          </div>
-          <div class="layer layer--chip">
-            <div class="chip" data-hero-chip>
-              <div class="mini-eyebrow">Rents vs. comps</div>
-              <div class="chip-value">+$85</div>
-              <div class="chip-note">a unit, a month, under today’s comps</div>
-            </div>
+      </div>
+      <div class="h-open-frame" data-in="300" data-in-frame aria-hidden="true">
+        <div class="h-open-app">
+          <img class="h-shot is-on" data-shot src="/assets/app/app-home-1280.jpg" srcset="/assets/app/app-home-1280.jpg 1280w, /assets/app/app-home-2560.jpg 2560w" sizes="(min-width: 1455px) 1089px, 76vw" alt="">
+          <img class="h-shot" data-shot src="/assets/app/app-deal-1280.jpg" srcset="/assets/app/app-deal-1280.jpg 1280w, /assets/app/app-deal-2560.jpg 2560w" sizes="(min-width: 1455px) 1089px, 76vw" alt="" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Proof numbers: site.js fills them from /assets/stats.js; with no number they read "Not yet measured" -->
+  <section class="h-proof">
+    <div class="h-proof-grid">
+      <div class="h-stat" data-rise="0" data-stat="minutes">
+        <div class="h-stat-top"><span class="h-stat-num is-empty">—</span><span class="h-pill">Not yet measured</span></div>
+        <div class="h-stat-label">Average minutes to underwrite a deal</div>
+      </div>
+      <div class="h-stat" data-rise="120" data-stat="dollars">
+        <div class="h-stat-top"><span class="h-stat-num is-empty">$—</span><span class="h-pill">Not yet measured</span></div>
+        <div class="h-stat-label">Of multifamily underwritten on Civium</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. A week of underwriting: five steps; the screen follows the step (6.5s each once in view, or a click) -->
+  <section class="h-section" id="how">
+    <div class="h-wrap">
+      <div class="h-head h-head--top" data-rise="0">
+        <h2 class="h-h2 h-h2--speed">A week of underwriting. Done in minutes.</h2>
+        <div class="h-head-aside">
+          <p class="h-accent h-accent--speed">Civium does the underwriting. You make the call.</p>
+          <p class="h-lead">Send the rent roll and the T-12. Civium reads both, pulls rents from the buildings around it, and returns the full underwriting in minutes, next day at the latest.</p>
+        </div>
+      </div>
+      <div class="h-walk">
+        <ol class="h-steps" data-rise="0">
+          <li><button type="button" class="h-step is-on" data-walk-step aria-pressed="true"><span class="h-step-eyebrow">Upload</span><span class="h-step-title">Drop in the files.</span><span class="h-step-body">The rent roll, the T-12, and your own model if you have one.</span></button></li>
+          <li><button type="button" class="h-step" data-walk-step aria-pressed="false"><span class="h-step-eyebrow">Rent Roll Analyzer</span><span class="h-step-title">Every unit, read.</span><span class="h-step-body">Rents, leases and occupancy, unit by unit, from the rent roll you send.</span></button></li>
+          <li><button type="button" class="h-step" data-walk-step aria-pressed="false"><span class="h-step-eyebrow">T-12 Analyzer</span><span class="h-step-title">Every line of the statement.</span><span class="h-step-body">Twelve months of income and expenses, set against your other deals.</span></button></li>
+          <li><button type="button" class="h-step" data-walk-step aria-pressed="false"><span class="h-step-eyebrow">Market Data Analyzer</span><span class="h-step-title">Rents against the street.</span><span class="h-step-body">The building’s rents next to the comps around it.</span></button></li>
+          <li><button type="button" class="h-step" data-walk-step aria-pressed="false"><span class="h-step-eyebrow">Pro Forma</span><span class="h-step-title">Worth today, and the upside.</span><span class="h-step-body">The value on today’s income, then what each lever adds.</span></button></li>
+        </ol>
+        <div class="h-app h-app--walk" data-rise="120" aria-hidden="true">
+          <img class="h-shot is-on" data-walk-frame src="/assets/app/walk-upload-1280.jpg" srcset="/assets/app/walk-upload-1280.jpg 1280w, /assets/app/walk-upload-2560.jpg 2560w" sizes="(min-width: 1455px) 897px, (min-width: 1000px) 62vw, 92vw" alt="" loading="lazy">
+          <img class="h-shot" data-walk-frame data-src="/assets/app/walk-rent-roll-1280.jpg" data-srcset="/assets/app/walk-rent-roll-1280.jpg 1280w, /assets/app/walk-rent-roll-2560.jpg 2560w" sizes="(min-width: 1455px) 897px, (min-width: 1000px) 62vw, 92vw" alt="">
+          <img class="h-shot" data-walk-frame data-src="/assets/app/walk-t12-1280.jpg" data-srcset="/assets/app/walk-t12-1280.jpg 1280w, /assets/app/walk-t12-2560.jpg 2560w" sizes="(min-width: 1455px) 897px, (min-width: 1000px) 62vw, 92vw" alt="">
+          <img class="h-shot" data-walk-frame data-src="/assets/app/walk-market-1280.jpg" data-srcset="/assets/app/walk-market-1280.jpg 1280w, /assets/app/walk-market-2560.jpg 2560w" sizes="(min-width: 1455px) 897px, (min-width: 1000px) 62vw, 92vw" alt="">
+          <img class="h-shot" data-walk-frame data-src="/assets/app/walk-pro-forma-1280.jpg" data-srcset="/assets/app/walk-pro-forma-1280.jpg 1280w, /assets/app/walk-pro-forma-2560.jpg 2560w" sizes="(min-width: 1455px) 897px, (min-width: 1000px) 62vw, 92vw" alt="">
+          <div class="h-chips">
+            <div class="h-chip h-chip--rr" data-walk-chip><span class="h-chip-badge">XLSX</span><span class="h-chip-name">Larkspur rent roll.xlsx</span></div>
+            <div class="h-chip h-chip--t12" data-walk-chip><span class="h-chip-badge">PDF</span><span class="h-chip-name">Larkspur T-12.pdf</span></div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 2. What you get -->
-  <section class="value" id="value">
-    <div class="value-grid">
-      <div data-rise="0">
-        <div class="eyebrow">What you get</div>
-        <h2 class="h2">See where the value is before the owner meeting.</h2>
-        <p class="lead">Civium checks every line that moves NOI: rents against today’s comps, insurance, utilities and taxes against what your other deals pay, and the cap rate the market is paying. You see where the value can go and how much it adds.</p>
+  <!-- 4. Who it's for: three photo cards; on hover the photo fades and the copy lifts -->
+  <section class="h-section h-section--wash">
+    <div class="h-wrap">
+      <h2 class="h-h2 h-h2--who" data-rise="0">One deal. Every seat at the table.</h2>
+      <div class="h-cards">
+        <div class="h-card" data-rise="0"><img class="h-card-img" src="/assets/photos/home-card-brokers.jpg" alt="" loading="lazy"><div class="h-card-shade"></div><div class="h-card-text"><h3 class="h-card-title">For brokers.</h3><p class="h-card-body">Price the listing before the pitch. Know what a buyer will pay, and why.</p></div></div>
+        <div class="h-card" data-rise="120"><img class="h-card-img" src="/assets/photos/home-card-buyers.jpg" alt="" loading="lazy"><div class="h-card-shade"></div><div class="h-card-text"><h3 class="h-card-title">For buyers.</h3><p class="h-card-body">Underwrite every deal that crosses your desk. Chase the ones that work.</p></div></div>
+        <div class="h-card" data-rise="240"><img class="h-card-img" src="/assets/photos/home-card-lenders.jpg" alt="" loading="lazy"><div class="h-card-shade"></div><div class="h-card-text"><h3 class="h-card-title">For lenders.</h3><p class="h-card-body">Size the loan on what the building earns today.</p></div></div>
       </div>
-      <div class="bridge" data-bridge>
-        <div class="bridge-back"></div>
-        <div class="bridge-card">
-          <div class="bridge-head">
-            <div>
-              <div class="bridge-title">Larkspur Crossing</div>
-              <div class="bridge-sub">96 units · sample deal</div>
+    </div>
+  </section>
+
+  <!-- 5. The plan: the Pro Forma's Optimization view, from the potential valuation range down -->
+  <section class="h-section">
+    <div class="h-wrap">
+      <div class="h-head" data-rise="0">
+        <h2 class="h-h2 h-h2--plan">Most underwriting stops at the price. Civium shows the plan.</h2>
+        <div class="h-head-aside">
+          <p class="h-accent">Know the upside before you bid.</p>
+          <p class="h-lead">Civium finds the levers in the building: rents to the comps, occupancy, utilities. Each one shows what it adds to the value, when it lands, and where the number came from.</p>
+        </div>
+      </div>
+      <div class="h-app h-app--plan" data-rise="0" aria-hidden="true"><img class="h-shot" src="/assets/app/plan-optimization-1280.jpg" srcset="/assets/app/plan-optimization-1280.jpg 1280w, /assets/app/plan-optimization-2560.jpg 2560w" sizes="(min-width: 1455px) 1312px, 92vw" alt="" loading="lazy"></div>
+    </div>
+  </section>
+
+  <!-- 6. Underwriting you can defend: a cursor clicks a number and its sources open; three examples, 7.5s each -->
+  <section class="h-section h-section--wash">
+    <div class="h-trust">
+      <div class="h-trust-copy" data-rise="0">
+        <h2 class="h-h2 h-h2--trust">Underwriting you can defend.</h2>
+        <p class="h-lead">Every figure traces to the line it came from, so it stands up in the pitch, at committee and in diligence.</p>
+        <div class="h-notes">
+          <div><h3 class="h-note-title">In the pitch.</h3><p class="h-note-body">Tap any number and its source opens, down to the line in the seller’s T-12.</p></div>
+          <div><h3 class="h-note-title">At committee.</h3><p class="h-note-body">Civium underwrites the way buyers do, so the numbers hold up on the other side of the table.</p></div>
+          <div><h3 class="h-note-title">In diligence.</h3><p class="h-note-body">Rents trace to the rent roll and the comps, expenses to the T-12, and the cap rate to the market it came from.</p></div>
+        </div>
+      </div>
+      <div class="h-trace" data-rise="120" data-trace>
+        <div class="h-mock" data-mock aria-hidden="true">
+          <div class="h-mock-in">
+            <div class="h-mock-bar"><span class="h-mock-mark">CIVIUM</span><span class="h-mock-sep"></span><span class="h-mock-name">Larkspur Crossing</span><span class="h-mock-place">Houston, Texas · 96 units</span></div>
+            <div class="h-mock-tabs"><span class="h-tab" data-tab>Rent Roll Analyzer</span><span class="h-tab" data-tab>T-12 Analyzer</span><span class="h-tab" data-tab>Market Data Analyzer</span><span class="h-tab is-on" data-tab>Pro Forma</span></div>
+            <div class="h-scenes">
+              <div class="h-scene is-on" data-scene><div class="h-tiles"><div class="h-tile is-hit" data-target><div class="h-tile-l">Worth today</div><div class="h-tile-v" data-value>$10,045,538</div><div class="h-tile-s">on today’s income</div></div><div class="h-tile"><div class="h-tile-l">Net operating income</div><div class="h-tile-v">$652,960</div><div class="h-tile-s">last 12 months</div></div><div class="h-tile"><div class="h-tile-l">Cap rate</div><div class="h-tile-v">6.50%</div><div class="h-tile-s">Houston, Class B</div></div><div class="h-tile"><div class="h-tile-l">A unit</div><div class="h-tile-v">$104,641</div><div class="h-tile-s">96 units</div></div></div><div><div class="h-eb">Income approach</div><div class="h-sr"><span>Effective gross income</span><span>$1,267,661</span></div><div class="h-sr"><span>Operating expenses</span><span>−$614,701</span></div><div class="h-sr"><span>Net operating income</span><span>$652,960</span></div><div class="h-sr"><span>Cap rate, Houston, Class B</span><span>6.50%</span></div><div class="h-sr h-sr--total"><span>Worth today</span><span>$10,045,538</span></div></div></div>
+              <div class="h-scene" data-scene><div class="h-tiles"><div class="h-tile"><div class="h-tile-l">Units</div><div class="h-tile-v">96</div><div class="h-tile-s">85,920 sf</div></div><div class="h-tile"><div class="h-tile-l">Occupied</div><div class="h-tile-v">91.7%</div><div class="h-tile-s">88 of 96 units</div></div><div class="h-tile"><div class="h-tile-l">Avg rent in place</div><div class="h-tile-v">$1,346</div><div class="h-tile-s">comps $1,439</div></div><div class="h-tile" data-target><div class="h-tile-l">Rents to the comps</div><div class="h-tile-v" data-value>+$8,160</div><div class="h-tile-s">a month, 88 units</div></div></div><div class="h-insights"><div class="h-insight"><div class="h-insight-h">Rent</div><div class="h-insight-p">In-place rents run about $93 a unit under today’s comp asks, $8,160 a month across the property.</div></div><div class="h-insight"><div class="h-insight-h">Who stays</div><div class="h-insight-p">38.6% of residents have stayed two years or more. Median tenure is 19 months.</div></div><div class="h-insight"><div class="h-insight-h">Timing</div><div class="h-insight-p">11 leases end in March 2027, the largest month in the next twelve.</div></div><div class="h-insight"><div class="h-insight-h">Watch</div><div class="h-insight-p">6 leases are month-to-month, $8,120 a month, 6.9% of rent in place.</div></div></div></div>
+              <div class="h-scene" data-scene><div class="h-tiles"><div class="h-tile"><div class="h-tile-l">Effective gross income</div><div class="h-tile-v">$1,267,661</div><div class="h-tile-s">last 12 months</div></div><div class="h-tile"><div class="h-tile-l">Operating expenses</div><div class="h-tile-v">$614,701</div><div class="h-tile-s">last 12 months</div></div><div class="h-tile" data-target><div class="h-tile-l">Insurance</div><div class="h-tile-v" data-value>$614</div><div class="h-tile-s">a unit, 21% under yours</div></div><div class="h-tile"><div class="h-tile-l">Utilities</div><div class="h-tile-v">$1,005</div><div class="h-tile-s">a unit</div></div></div><div><div class="h-eb">Expenses, last 12 months</div><div class="h-cols"><div><div class="h-sr"><span>Real estate taxes</span><span>$188,650</span></div><div class="h-sr"><span>Payroll</span><span>$104,000</span></div><div class="h-sr"><span>Utilities</span><span>$96,480</span></div><div class="h-sr"><span>Repairs &amp; maintenance</span><span>$71,520</span></div></div><div><div class="h-sr"><span>Insurance</span><span>$58,901</span></div><div class="h-sr"><span>Contract services</span><span>$42,300</span></div><div class="h-sr"><span>Administrative</span><span>$38,640</span></div><div class="h-sr"><span>Marketing</span><span>$14,210</span></div></div></div></div></div>
             </div>
-            <button type="button" class="replay" data-replay hidden>Replay</button>
+            <div class="h-pop h-pop--0 is-open" data-pop><div class="h-pop-head"><span class="h-pop-name">Worth today</span><span class="h-pop-val">$10,045,538</span></div><div class="h-pop-how">Net operating income at the market cap rate.</div><div class="h-src" data-pop-row><span class="h-badge">PDF</span><div class="h-src-text"><div class="h-src-l">Effective gross income</div><div class="h-src-s">Larkspur T-12.pdf · page 1, line 14</div></div><span class="h-src-v">$1,267,661</span></div><div class="h-src" data-pop-row><span class="h-badge">PDF</span><div class="h-src-text"><div class="h-src-l">Operating expenses</div><div class="h-src-s">Larkspur T-12.pdf · page 2, line 39</div></div><span class="h-src-v">−$614,701</span></div><div class="h-src" data-pop-row><span class="h-badge">MKT</span><div class="h-src-text"><div class="h-src-l">Cap rate, Houston, Class B</div><div class="h-src-s">Civium market data</div></div><span class="h-src-v">6.50%</span></div><div class="h-eq" data-pop-row><span>($1,267,661 − $614,701) ÷ 6.50%</span><span class="h-eq-res">$10,045,538</span></div></div>
+            <div class="h-pop h-pop--1" data-pop><div class="h-pop-head"><span class="h-pop-name">Rents to the comps</span><span class="h-pop-val">+$8,160 a month</span></div><div class="h-pop-how">Each occupied unit’s rent against comps for the same floor plan.</div><div class="h-src" data-pop-row><span class="h-badge">MKT</span><div class="h-src-text"><div class="h-src-l">Comps for the 88 occupied units</div><div class="h-src-s">12 comps within a mile · Civium market data</div></div><span class="h-src-v">$126,608</span></div><div class="h-src" data-pop-row><span class="h-badge">XLSX</span><div class="h-src-text"><div class="h-src-l">In-place rent, 88 occupied units</div><div class="h-src-s">Larkspur rent roll.xlsx · rows 2–97, column F</div></div><span class="h-src-v">−$118,448</span></div><div class="h-eq" data-pop-row><span>$126,608 − $118,448</span><span class="h-eq-res">+$8,160 a month</span></div></div>
+            <div class="h-pop h-pop--2" data-pop><div class="h-pop-head"><span class="h-pop-name">Insurance</span><span class="h-pop-val">$614 a unit</span></div><div class="h-pop-how">The statement’s insurance over the units, against your other buildings.</div><div class="h-src" data-pop-row><span class="h-badge">PDF</span><div class="h-src-text"><div class="h-src-l">Insurance, last 12 months</div><div class="h-src-s">Larkspur T-12.pdf · page 2, line 31</div></div><span class="h-src-v">$58,901</span></div><div class="h-src" data-pop-row><span class="h-badge">XLSX</span><div class="h-src-text"><div class="h-src-l">Units</div><div class="h-src-s">Larkspur rent roll.xlsx · rows 2–97</div></div><span class="h-src-v">96</span></div><div class="h-src" data-pop-row><span class="h-badge">CIV</span><div class="h-src-text"><div class="h-src-l">Your other buildings</div><div class="h-src-s">Median of your deals on Civium</div></div><span class="h-src-v">$777 a unit</span></div><div class="h-eq" data-pop-row><span>$58,901 ÷ 96 units, 21% under yours</span><span class="h-eq-res">$614 a unit</span></div></div>
+            <div class="h-cursor" data-cursor><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 2l15 11-6.5 1.2L16 21l-3 1.4-3.4-6.8L4 20z"></path></svg></div>
           </div>
-          <div class="brow" data-brow>
-            <div class="brow-line">
-              <div>
-                <div class="brow-label">Worth today</div>
-                <div class="brow-sub">The seller’s NOI of $652,960 at a 6.50% cap</div>
-              </div>
-              <span class="brow-value" data-count="10045538" data-pre="$">$10,045,538</span>
-            </div>
-            <div class="bar-track"><div class="bar bar--worth" data-bar></div></div>
-          </div>
-          <div class="brow" data-brow>
-            <div class="brow-line">
-              <div>
-                <div class="brow-label">Rents to market</div>
-                <div class="brow-sub">96 units renting $85 a month under the comps</div>
-              </div>
-              <span class="brow-value brow-value--up" data-count="1506462" data-pre="+$">+$1,506,462</span>
-            </div>
-            <div class="bar-track"><div class="bar bar--rents" data-bar></div></div>
-          </div>
-          <div class="brow" data-brow>
-            <div class="brow-line">
-              <div>
-                <div class="brow-label">Insurance to your deals</div>
-                <div class="brow-sub">$250 a unit a year above what your other deals pay</div>
-              </div>
-              <span class="brow-value brow-value--up" data-count="369231" data-pre="+$">+$369,231</span>
-            </div>
-            <div class="bar-track"><div class="bar bar--insurance" data-bar></div></div>
-          </div>
-          <div class="brow brow--total" data-brow>
-            <div class="brow-line">
-              <div>
-                <div class="brow-label">What Civium finds</div>
-                <div class="brow-sub">The number to walk in with</div>
-              </div>
-              <span class="brow-value brow-value--total" data-count="11921231" data-pre="$">$11,921,231</span>
-            </div>
-            <div class="bar-track bar-track--gold"><div class="bar bar--finds" data-bar></div></div>
-          </div>
-          <div class="bridge-foot">Rents come from the comps. Insurance comes from your own deals.</div>
+        </div>
+        <div class="h-picks">
+          <button type="button" class="h-pick is-on" data-pick aria-pressed="true"><span class="h-pick-track"><span class="h-pick-bar" data-pick-bar></span></span><span class="h-pick-eb">Pro Forma</span><span class="h-pick-title">Worth today</span></button>
+          <button type="button" class="h-pick" data-pick aria-pressed="false"><span class="h-pick-track"><span class="h-pick-bar" data-pick-bar></span></span><span class="h-pick-eb">Rent roll</span><span class="h-pick-title">Rents to the comps</span></button>
+          <button type="button" class="h-pick" data-pick aria-pressed="false"><span class="h-pick-track"><span class="h-pick-bar" data-pick-bar></span></span><span class="h-pick-eb">T-12</span><span class="h-pick-title">Insurance a unit</span></button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 3. How it works -->
-  <section class="how" id="how">
-    <div class="how-inner">
-      <div class="how-head" data-rise="0">
-        <div>
-          <div class="eyebrow">How it works</div>
-          <h2 class="h2">Send the files. Civium does the math.</h2>
+  <!-- 7. Your deals stay yours. The "Civium Privacy Policy" link joins the paragraph once /privacy/ exists (README, Open items). -->
+  <section class="h-section">
+    <div class="h-wrap">
+      <div class="h-head h-head--privacy" data-rise="0">
+        <h2 class="h-h2 h-h2--privacy">Your deals stay yours.</h2>
+        <div class="h-head-aside">
+          <p class="h-lead">Civium keeps every firm’s deals apart and uses them for one thing: underwriting yours.</p>
         </div>
-        <div class="how-aside">Minutes for most deals. Next day at the latest.</div>
       </div>
-      <ol class="steps">
-        <li class="step" data-rise="0">
-          <div class="step-top"><span class="step-num">1</span><span class="mini-eyebrow">You</span></div>
-          <p class="step-text">Send the rent roll, T-12, and your model if you have one.</p>
-          <div class="pills">
-            <span class="pill" data-rise="200"><span class="pill-dot"></span>Rent roll</span>
-            <span class="pill" data-rise="320"><span class="pill-dot"></span>T-12</span>
-            <span class="pill" data-rise="440"><span class="pill-dot"></span>Your model</span>
-          </div>
-        </li>
-        <li class="step" data-rise="120">
-          <div class="step-top"><span class="step-num">2</span><span class="mini-eyebrow">Civium</span></div>
-          <p class="step-text">Civium finds the upside.</p>
-          <div class="pills">
-            <span class="pill" data-rise="320"><span class="pill-dot pill-dot--green"></span>Rents vs. comps</span>
-            <span class="pill" data-rise="440"><span class="pill-dot pill-dot--green"></span>Expenses vs. your deals</span>
-            <span class="pill" data-rise="560"><span class="pill-dot"></span>Market cap rate</span>
-          </div>
-        </li>
-        <li class="step" data-rise="240">
-          <div class="step-top"><span class="step-num">3</span><span class="mini-eyebrow">You</span></div>
-          <p class="step-text">Walk in with the upside.</p>
-          <div class="pills">
-            <span class="pill" data-rise="440"><span class="pill-dot"></span>Your model beside Civium’s</span>
-            <span class="pill" data-rise="560"><span class="pill-dot"></span>Every number sourced</span>
-          </div>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <!-- 4. The receipt (dark) -->
-  <section class="receipt">
-    <div class="grain" data-grain></div>
-    <div class="receipt-glow"></div>
-    <div class="receipt-grid">
-      <div data-rise="0">
-        <div class="eyebrow eyebrow--receipt">The receipt</div>
-        <h2 class="h2">Every number shows where it came from.</h2>
-        <p class="lead lead--receipt">Tap a number and its source opens, down to the line in the seller’s T-12.</p>
-      </div>
-      <div class="sources" data-sources>
-        <div class="srccard is-on" data-srccard="noi">
-          <div class="mini-eyebrow">Source · T-12 statement</div>
-          <div class="src-title">Larkspur Crossing, trailing 12 months</div>
-          <div class="src-rows">
-            <div class="src-row"><span>Gross potential rent</span><span>1,382,400</span></div>
-            <div class="src-row"><span>Vacancy and loss</span><span>(114,739)</span></div>
-            <div class="src-row"><span>Operating expenses</span><span>(614,701)</span></div>
-            <div class="src-row src-row--key is-on" data-srcrow="noi"><span>Net operating income</span><span>652,960</span></div>
-          </div>
-        </div>
-        <div class="srccard" data-srccard="cap">
-          <div class="mini-eyebrow">Source · Sales comps</div>
-          <div class="src-title">Three garden trades, last 12 months</div>
-          <div class="src-rows">
-            <div class="src-row"><span>Sale 1 · 112 units</span><span>6.35%</span></div>
-            <div class="src-row"><span>Sale 2 · 88 units</span><span>6.55%</span></div>
-            <div class="src-row"><span>Sale 3 · 140 units</span><span>6.60%</span></div>
-            <div class="src-row src-row--key" data-srcrow="cap"><span>Market cap rate, average</span><span>6.50%</span></div>
-          </div>
-        </div>
-        <div class="formula">
-          <div class="mini-eyebrow">Worth today</div>
-          <div class="formula-value"><span>$10,045,538</span></div>
-          <div class="formula-line">
-            <span>=</span>
-            <button type="button" class="srcbtn is-on" data-srcbtn="noi" aria-pressed="true">$652,960</button>
-            <span>÷</span>
-            <button type="button" class="srcbtn" data-srcbtn="cap" aria-pressed="false">6.50%</button>
-          </div>
-          <div class="formula-caption">Net operating income over the market cap rate</div>
-        </div>
+      <div class="h-promises">
+        <div data-rise="0"><span class="h-icon"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg></span><h3 class="h-promise-title">Never shared with another firm.</h3><p class="h-promise-body">A team never sees another team’s deal, its files, or that it exists.</p></div>
+        <div data-rise="120"><span class="h-icon"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M6.4 6.4l11.2 11.2"></path></svg></span><h3 class="h-promise-title">Never used to train anything.</h3><p class="h-promise-body">Your rent rolls and statements underwrite your deals and nothing else.</p></div>
+        <div data-rise="240"><span class="h-icon"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="15" r="4"></circle><path d="M11 12l8-8M16 7l2 2M13.5 9.5l2 2"></path></svg></span><h3 class="h-promise-title">Yours to keep.</h3><p class="h-promise-body">The data belongs to whoever pays for it.</p></div>
+        <div data-rise="360"><span class="h-icon"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="4"></rect><circle cx="7.5" cy="12" r="2"></circle></svg></span><h3 class="h-promise-title">Pooling is off.</h3><p class="h-promise-body">Comparing against other firms’ deals is opt-in, and off until you turn it on.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- 5. The record -->
-  <section class="record">
-    <div class="record-inner">
-      <div class="eyebrow">The record</div>
-      <h2 class="record-title">$200M of multifamily underwritten on the buy side.</h2>
-      <p class="record-line">Civium underwrites the way buyers do, so the numbers hold up on the other side of the table.</p>
-      <div class="stack" data-tilt>
-        <div class="sheet sheet--back"></div>
-        <div class="sheet sheet--mid"></div>
-        <div class="stack-page" data-sample-slot></div>
-      </div>
-      <div class="record-caption">Larkspur Crossing, a sample deal — invented property, real method.</div>
-    </div>
-  </section>
-
-  <!-- 6. Privacy -->
-  <section class="privacy">
-    <div class="privacy-grid">
-      <h2 class="eyebrow eyebrow--list">Privacy</h2>
-      <div data-rise="0">
-        <h3 class="item-title">Private to your team.</h3>
-        <p class="item-body">A team never sees another team’s deal, file, or that it exists.</p>
-      </div>
-      <div data-rise="120" data-trial>
-        <h3 class="item-title">View-only until you choose.</h3>
-        <p class="item-body">A free preview opens on a private link for <span data-preview-days></span> days. Exporting starts a <span data-trial-days></span>-day free trial.</p>
-      </div>
+  <!-- 8. Close -->
+  <section class="h-close">
+    <div class="h-drift" data-drift="close"><img class="h-photo" src="/assets/photos/home-close.jpg" alt="" loading="lazy"></div>
+    <div class="h-close-wash"></div>
+    <div class="h-close-inner">
+      <h2 class="h-close-title" data-rise="0">The underwriting desk for multifamily.</h2>
+      <a class="h-btn h-btn--close" href="mailto:deals@civiumcre.com" data-cta data-rise="150">Create account</a>
     </div>
   </section>
 
 </main>
 
-<!-- 7. Footer (Home: the Firm cell and the last cell) -->
-<footer class="footer">
-  <div class="footer-grid">
-    <div><div class="cell-label">Name</div><div class="cell-value">Caden Crouch</div></div>
-    <div><div class="cell-label">Firm</div><div class="cell-value">Civium</div></div>
-    <div><div class="cell-label">Based in</div><div class="cell-value">Austin, Texas</div></div>
-    <div><div class="cell-label">Covers</div><div class="cell-value">Texas multifamily</div></div>
-    <div><div class="cell-label">Email</div><a class="cell-email" href="mailto:ccrouch@civiumcre.com">ccrouch@civiumcre.com</a></div>
-    <div class="cell-actions">
-      <a class="btn btn--footer" href="mailto:deals@civiumcre.com" data-cta></a>
-      <a class="footer-link" href="/pricing/">Pricing</a>
-      <a class="footer-link" href="/faq/">FAQ</a>
-    </div>
+<!-- 9. Footer -->
+<footer class="h-footer">
+  <div class="h-footer-inner">
+    <div class="h-footer-brand"><span class="h-footer-mark">CIVIUM</span><span class="h-footer-place">Austin, Texas</span></div>
+    <nav class="h-footer-nav"><a href="#how">How it works</a><a href="/pricing/">Pricing</a><a href="/faq/">FAQ</a><a href="/" data-sign-in hidden>Client portal</a></nav>
   </div>
 </footer>
 </div>
@@ -310,29 +245,7 @@
   </div>
 </div>
 
-<!-- The sample page: its one source, cloned by site.js into the hero and The record. Its copy is under review. -->
-<template id="sample-page">
-  <div class="sp">
-    <div class="sp-page">
-      <div class="sp-top"><span class="sp-mark">CIVIUM</span><span class="sp-kind">Owner’s page</span></div>
-      <div class="sp-rule"></div>
-      <div class="sp-title">Larkspur Crossing</div>
-      <div class="sp-facts">96 units · 85,920 sf · 91.7% occupied</div>
-      <div class="sp-label">Worth today</div>
-      <div class="sp-worth"><span>$10,045,538</span></div>
-      <div class="sp-basis">at a 6.50% cap on NOI of $652,960</div>
-      <div class="sp-rows">
-        <div class="sp-row"><span>Net operating income</span><span class="sp-num">$652,960</span></div>
-        <div class="sp-row"><span>Market cap rate</span><span class="sp-num">6.50%</span></div>
-        <div class="sp-row"><span>A buyer’s model</span><span class="sp-num">$10,757,719</span></div>
-        <div class="sp-row sp-row--net"><span>The owner nets, before taxes</span><span class="sp-num">$3,642,564</span></div>
-      </div>
-      <div class="sp-fill"></div>
-      <div class="sp-foot"><span>Sample deal · invented property</span><span>Civium · Houston, Texas</span></div>
-    </div>
-  </div>
-</template>
-
+<script src="/assets/stats.js"></script>
 <script src="/assets/site.js"></script>
 </body>
 </html>

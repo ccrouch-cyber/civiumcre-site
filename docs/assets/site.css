@@ -25,6 +25,58 @@
   --shadow-source-card: 0 30px 60px -20px rgba(0,0,0,.55);     /* the NOI and Cap cards (prototype) */
   --shadow-formula-card: 0 40px 80px -24px rgba(0,0,0,.7);     /* the formula card (prototype) */
   --shadow-panel: 0 40px 100px -30px rgba(0,0,0,.6);           /* the modal "Panel" */
+
+  /* The coastal site: Home, Pricing, FAQ and 404 (design_handoff_homepage/README.md): its palette and one-off values */
+  --coastal-paper: #F3ECE1;                    /* the page */
+  --coastal-wash: #E8DFD0;                     /* Who it's for, Underwriting you can defend */
+  --coastal-ink: #24303A;                      /* text */
+  --coastal-soft: #56616B;                     /* secondary text */
+  --coastal-deep: #526373;                     /* card fill, privacy icons */
+  --coastal-night: #2E3A46;                    /* the proof band */
+  --coastal-ondeep: #F6F1E8;                   /* text on photos and the proof band */
+  --coastal-ondeep2: #E7E3DB;                  /* secondary text on photos and the proof band */
+  --coastal-metal: #9E5633;                    /* buttons, orange lines, the active step */
+  --coastal-metal-hover: #B0633D;              /* buttons on hover */
+  --coastal-onmetal: #F8F2E8;                  /* button text */
+  --coastal-line: #E0AE8C;                     /* the opening's lines, "Not yet measured" */
+  --coastal-hz1: #8C9AA6;                      /* the photo bands before a photo loads, top */
+  --coastal-hz2: #D9B48C;                      /* the photo bands before a photo loads, bottom */
+  --coastal-rule: rgba(246,241,232,.22);       /* the header's rule and divider, the proof band's dividers */
+  --coastal-ghost-line: rgba(246,241,232,.4);  /* Pricing: the Team card's Talk to us outline */
+  --coastal-hair: rgba(36,48,58,.16);          /* hairlines on paper */
+  --coastal-white: #FFFFFF;                    /* app screens, the mock, file chips, icon circles */
+  --coastal-mask: #000;                        /* the opening lines' fade-in mask (alpha only) */
+  --coastal-wash-94: rgba(82,99,115,.94);      /* the coastal wash (--coastal-deep) at 94% … */
+  --coastal-wash-86: rgba(82,99,115,.86);
+  --coastal-wash-60: rgba(82,99,115,.60);
+  --coastal-wash-50: rgba(82,99,115,.50);
+  --coastal-wash-45: rgba(82,99,115,.45);
+  --coastal-wash-36: rgba(82,99,115,.36);
+  --coastal-wash-26: rgba(82,99,115,.26);      /* … and at 26% */
+  --coastal-app-ink: #141414;                  /* the trust mock: the app's Coastal colors */
+  --coastal-app-ink-soft: #4A4A48;
+  --coastal-app-fade: #73736F;
+  --coastal-app-line: #E4E4E1;
+  --coastal-app-line-soft: #EEEEEB;
+  --coastal-app-wash: #F6F6F4;
+  --coastal-app-accent: #C2662D;
+  --coastal-app-accent-deep: #9F4F1F;
+  --coastal-app-accent-wash: #FBF1EA;
+  --coastal-chip-line: #DFE4E9;                /* the walkthrough's two file chips */
+  --coastal-chip-badge: #EEF2F6;
+  --coastal-chip-badge-ink: #3F4F5E;
+  --coastal-shadow-hero-app: 0 0 0 1px rgba(0,0,0,.10), 0 40px 90px -30px rgba(0,0,0,.55);
+  --coastal-shadow-app: 0 0 0 1px rgba(36,48,58,.16), 0 50px 100px -50px rgba(36,48,58,.5);
+  --coastal-shadow-mock: 0 0 0 1px rgba(20,20,20,.08), 0 44px 90px -40px rgba(36,48,58,.55);
+  --coastal-shadow-chip: 0 18px 40px -14px rgba(36,48,58,.45);
+  --coastal-shadow-pop: 0 28px 60px -22px rgba(20,20,20,.38);
+  --coastal-shadow-icon: 0 16px 34px -16px rgba(36,48,58,.4);
+  --coastal-serif: 'Source Serif 4', Georgia, serif;                    /* headings, numbers */
+  --coastal-sans: 'Schibsted Grotesk', system-ui, sans-serif;           /* everything else */
+  --coastal-display: Georgia, 'Iowan Old Style', serif;                 /* the two big headlines */
+  --coastal-app-serif: Georgia, 'Times New Roman', serif;               /* the trust mock, as the app sets it */
+  --coastal-app-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --coastal-ease: cubic-bezier(.22,.61,.24,1);
 }
 /* tokens:end */
 

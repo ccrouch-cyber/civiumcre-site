@@ -1,0 +1,37 @@
+# The homepage's two live numbers (design_handoff_homepage/README.md, "Live numbers").
+# Every hour: ask the app for its public stats, write docs/assets/stats.js, run the site's checks, commit if it changed.
+# Pages then republishes docs/. Needs the repository secret CIVIUM_STATS_TOKEN (the app's stats token).
+# Turn the schedule on only once the app answers at STATS_URL; until then, run it by hand (Actions > Run workflow).
+name: Homepage numbers
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: '17 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: homepage-numbers
+  cancel-in-progress: false
+jobs:
+  numbers:
+    runs-on: ubuntu-latest
+    env:
+      STATS_URL: https://app.civiumcre.com/api/public/stats
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ask the app
+        env:
+          STATS_TOKEN: ${{ secrets.CIVIUM_STATS_TOKEN }}
+        run: curl -fsS --max-time 30 -H "Authorization: Bearer $STATS_TOKEN" "$STATS_URL" -o stats.json
+      - name: Write docs/assets/stats.js
+        run: node tools/write_stats.cjs stats.json docs/assets/stats.js
+      - name: Check the site
+        run: bash tools/check_site.sh
+      - name: Commit if the numbers changed
+        run: |
+          if git diff --quiet -- docs/assets/stats.js; then echo "No change"; exit 0; fi
+          git config user.name "civium-numbers"
+          git config user.email "deals@civiumcre.com"
+          git add docs/assets/stats.js
+          git commit -m "Homepage numbers"
+          git push

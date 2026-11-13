@@ -5,35 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Not found · Civium</title>
 <link rel="icon" href="data:,">
+<link rel="preload" href="/assets/fonts/source-serif-4-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/schibsted-grotesk-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/tokens.css">
 <link rel="stylesheet" href="/assets/system.css">
 <link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/coastal.css">
 </head>
-<body>
-<div class="site" data-site>
-<div class="page">
-  <header class="header">
+<body class="coastal">
+<div class="site h-root" data-site>
+<div class="h-bar"><div class="h-wrap">
+  <header class="header h-header h-header--paper">
     <a class="wordmark" href="/">CIVIUM</a>
     <nav class="nav">
       <a class="nav-link" href="/#how">How it works</a>
       <a class="nav-link" href="/pricing/">Pricing</a>
       <a class="nav-link" href="/faq/">FAQ</a>
-      <a class="btn btn--nav" href="mailto:deals@civiumcre.com" data-cta></a>
+      <span class="h-sep" aria-hidden="true" data-sign-in-sep></span>
     </nav>
   </header>
-  <main>
-    <section class="page-section">
-      <h1 class="page-title">Not found</h1>
-      <p class="lead"><a href="/">Home</a></p>
-    </section>
-  </main>
-</div>
-<footer class="footer">
-  <div class="footer-grid">
-    <div><div class="cell-label">Name</div><div class="cell-value">Caden Crouch</div></div>
-    <div><div class="cell-label">Based in</div><div class="cell-value">Austin, Texas</div></div>
-    <div><div class="cell-label">Covers</div><div class="cell-value">Texas multifamily</div></div>
-    <div><div class="cell-label">Email</div><a class="cell-email" href="mailto:ccrouch@civiumcre.com">ccrouch@civiumcre.com</a></div>
+</div></div>
+<main>
+  <section class="h-page">
+    <div class="h-wrap">
+      <h1 class="h-page-title">Not found</h1>
+      <p class="h-lead"><a class="h-link" href="/">Home</a></p>
+    </div>
+  </section>
+</main>
+<footer class="h-footer h-footer--rule">
+  <div class="h-footer-inner">
+    <div class="h-footer-brand"><span class="h-footer-mark">CIVIUM</span><span class="h-footer-place">Austin, Texas</span></div>
+    <nav class="h-footer-nav"><a href="/#how">How it works</a><a href="/pricing/">Pricing</a><a href="/faq/">FAQ</a><a href="/" data-sign-in hidden>Client portal</a></nav>
   </div>
 </footer>
 </div>
