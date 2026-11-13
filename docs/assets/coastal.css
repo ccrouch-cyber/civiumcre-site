@@ -329,7 +329,8 @@ html.gs-root, html.gs-root body { background: transparent; }
 .gs-panel--meet .gs-panel-ground { background: url(start/mottle-d.webp) center / cover no-repeat, var(--coastal-start-meet); }
 .gs-panel--free .gs-panel-ground { background: url(start/mottle-b.webp) center / cover no-repeat, var(--coastal-start-free); }
 .gs-panel--trial .gs-panel-ground { background: url(start/mottle-c.webp) center / cover no-repeat, var(--coastal-start-trial); }
-.gs-panel-grain { background-image: image-set(url(start/grain-240.webp) 1x, url(start/grain-480.webp) 2x); background-size: 240px 240px; }
+/* The grain: the one-pixel-per-point tile first, for a browser without image-set(); then the tile for the screen. */
+.gs-panel-grain { background-image: url(start/grain-240.webp); background-image: image-set(url(start/grain-240.webp) 1x, url(start/grain-480.webp) 2x); background-size: 240px 240px; }
 .gs-panel-text { position: relative; z-index: 2; flex: 1; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; max-width: 310px; padding: 26px 28px; }
 .gs-panel--meet .gs-panel-text { max-width: 340px; }
 .gs-panel-title { font: 600 clamp(26px,2.1vw,32px)/1.12 var(--coastal-serif); margin: 0; }
