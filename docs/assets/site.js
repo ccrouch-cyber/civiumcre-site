@@ -316,7 +316,7 @@ const CONFIG = {
     const statKey = { minutes: 'minutesAvg', dollars: 'dollarsUnderwritten' };
     const money = (v, d, unit) => '$' + (v / d).toFixed(v / d < 10 && unit === 'B' ? 1 : 0).replace(/\.0$/, '') + unit;
     const statText = {
-      minutes: v => String(Math.round(v)),
+      minutes: v => String(v < 10 ? Math.round(v * 10) / 10 : Math.round(v)),   // under ten minutes, one decimal (1.5, not 2)
       dollars: v => v >= 1e9 ? money(v, 1e9, 'B') : v >= 1e6 ? money(v, 1e6, 'M') : money(v, 1e3, 'K')
     };
     $$('[data-stat]', homeRoot).forEach(el => {
