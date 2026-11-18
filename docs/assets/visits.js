@@ -87,6 +87,7 @@
     const label = (el.getAttribute('data-track') || el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80);
     const a = el.closest('a[href]');
     const go = a ? a.getAttribute('data-gs-go') || a.getAttribute('data-go') : '';
+    const to = a ? leadsTo(a) : '';       // read before the visit's id is put on the link: the id is never part of it
     if (a) {
       // A link into the app carries this visit's id, so the house can tell which visits became accounts.
       try {
@@ -94,7 +95,7 @@
         if (u.origin === APP_ORIGIN && !u.searchParams.get('sv')) { u.searchParams.set('sv', session); a.href = u.toString(); }
       } catch (err) { /* not an address: left as it is */ }
     }
-    note('click', { n: label, to: a ? leadsTo(a) : '' });
+    note('click', { n: label, to });
     if (go) note('step', { n: 'start:go:' + go });
     if (a) send();                        // the page may be about to leave
   }, true);
