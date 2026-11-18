@@ -3,13 +3,13 @@
 // page, and the seconds the page is in front of someone. One address is posted to (COLLECT_URL) and nothing is asked
 // back. WHAT IT NEVER DOES: it sets no cookie, reads nothing a person types, records no screen, and sends no address
 // or name. A browser that asks not to be tracked (Global Privacy Control, Do Not Track) is given no id that outlasts
-// the visit. tools/check_site.sh holds these lines (rule 11).
+// the visit and carries none into the app. tools/check_site.sh holds these lines (rule 11).
 (() => {
   'use strict';
   const COLLECT_URL = 'https://app.civiumcre.com/api/site/collect';
   const APP_ORIGIN = 'https://app.civiumcre.com';
   const MARKS = [25, 50, 75, 100];        // how far down a page, as the house counts it
-  const PING_MS = 15000;                  // seconds in front of a page are reported this often, and when the page hides
+  const PING_MS = 30000;                  // seconds in front of a page are reported this often, and when the page hides
   const PINGS_MAX = 60;
   const IDLE_MS = 60000;                  // a page nobody has touched this long is no longer counted as read
   const BATCH = 24;
@@ -31,6 +31,7 @@
   const quiet = navigator.globalPrivacyControl === true || navigator.doNotTrack === '1' || window.doNotTrack === '1';
 
   const params = new URLSearchParams(location.search);
+  if (params.get('embed') === '1') return;   // the window framed inside the app's demo is the app's visit, not the site's
   const session = store('sessionStorage', 'civium.s', hex);
   const visitor = quiet ? '' : store('localStorage', 'civium.v', hex);
   let key = params.get('k') || '';
@@ -49,7 +50,7 @@
       const body = JSON.stringify({ s: session, v: visitor, k: key, e: queue.splice(0, BATCH) });
       try {
         fetch(COLLECT_URL, { method: 'POST', body, keepalive: true, credentials: 'omit', mode: 'no-cors',
-          headers: { 'Content-Type': 'text/plain' } }).catch(() => {});
+          referrerPolicy: 'strict-origin-when-cross-origin', headers: { 'Content-Type': 'text/plain' } }).catch(() => {});
       } catch (e) { /* a browser without keepalive: the line is lost, the page is not */ }
     }
   };
@@ -76,7 +77,8 @@
       const u = new URL(a.href, location.href);
       if (u.protocol === 'mailto:') return 'mailto';
       if (u.origin === location.origin) return (u.pathname + u.search).slice(0, 160);
-      if (u.origin === APP_ORIGIN) return ('app:' + u.pathname + u.search + u.hash).slice(0, 160);
+      // a link into the app: its page and plan, never the visit's id this script may have put on it
+      if (u.origin === APP_ORIGIN) return ('app:' + u.pathname + u.search + (/^#sv=/.test(u.hash) ? '' : u.hash)).slice(0, 160);
       return u.host.slice(0, 160);
     } catch (e) { return ''; }
   };
@@ -87,12 +89,13 @@
     const label = (el.getAttribute('data-track') || el.getAttribute('aria-label') || el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 80);
     const a = el.closest('a[href]');
     const go = a ? a.getAttribute('data-gs-go') || a.getAttribute('data-go') : '';
-    const to = a ? leadsTo(a) : '';       // read before the visit's id is put on the link: the id is never part of it
-    if (a) {
-      // A link into the app carries this visit's id, so the house can tell which visits became accounts.
+    const to = a ? leadsTo(a) : '';
+    if (a && !quiet) {
+      // A link to the app's sign-up page carries this visit's id, so the house can tell which visits became accounts.
+      // It rides the address's hash, which is never sent to a server; a browser that asks not to be tracked carries none.
       try {
         const u = new URL(a.href, location.href);
-        if (u.origin === APP_ORIGIN && !u.searchParams.get('sv')) { u.searchParams.set('sv', session); a.href = u.toString(); }
+        if (u.origin === APP_ORIGIN && u.pathname === '/signup' && !u.hash) { u.hash = 'sv=' + session; a.href = u.toString(); }
       } catch (err) { /* not an address: left as it is */ }
     }
     note('click', { n: label, to });

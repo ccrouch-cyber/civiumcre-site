@@ -311,19 +311,26 @@ else
     [ "$n" = 1 ] || bad "$(rel "$page") loads visits.js $n times (exactly once)"
     [ "$after" = "site visits " ] || bad "$(rel "$page") does not load site.js and then visits.js"
   done < <(pages)
-  n="$(printf '%s\n' "$vcode" | grep -c -E "(^|[^A-Za-z0-9_\$.])fetch[[:space:]]*\(")"
+  n="$(printf '%s\n' "$vcode" | grep -c -E "fetch[[:space:]]*\(")"     # every fetch(, whatever stands before it
   m="$(printf '%s\n' "$vcode" | grep -c -F "fetch(COLLECT_URL, { method: 'POST', body, keepalive: true, credentials: 'omit', mode: 'no-cors',")"
   { [ "$n" = 1 ] && [ "$m" = 1 ]; } || bad "visits.js calls fetch( on $n lines, $m of them the one post to COLLECT_URL without credentials (exactly one)"
   [ "$(grep -c -x "  const COLLECT_URL = 'https://app.civiumcre.com/api/site/collect';" "$VJS")" = 1 ] \
     || bad "visits.js's COLLECT_URL is not exactly https://app.civiumcre.com/api/site/collect"
   [ "$(printf '%s\n' "$vcode" | grep -c 'COLLECT_URL')" = 2 ] || bad "visits.js names COLLECT_URL other than where it is set and where it is posted to"
-  vnet="$(printf '%s\n' "$vcode" | grep -n -E "(^|[^A-Za-z0-9_\$.])(import|importScripts)[[:space:]]*\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource|RTCPeerConnection|serviceWorker|\.submit[[:space:]]*\(|postMessage|['\"]message['\"]|onmessage|new Image|\.src[[:space:]]*=")"
+  vnet="$(printf '%s\n' "$vcode" | grep -n -E "(^|[^A-Za-z0-9_\$.])(import|importScripts)[[:space:]]*\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource|RTCPeerConnection|serviceWorker|\.submit[[:space:]]*\(|postMessage|['\"]message['\"]|onmessage|new Image|\.src[[:space:]]*=|setAttribute[[:space:]]*\(|createElement|insertAdjacent|document\.write|\.action[[:space:]]*=|window\.open|location\.(assign|replace)[[:space:]]*\(|location(\.href)?[[:space:]]*=[^=]")"
   [ -z "$vnet" ] || { bad "visits.js reaches the network another way:"; printf '%s\n' "$vnet"; }
+  # the one address the script sets: the app's sign-up link, given this visit's id in its hash
+  n="$(printf '%s\n' "$vcode" | grep -c -E "\.href[[:space:]]*=[^=]")"
+  m="$(printf '%s\n' "$vcode" | grep -c -F "if (u.origin === APP_ORIGIN && u.pathname === '/signup' && !u.hash) { u.hash = 'sv=' + session; a.href = u.toString(); }")"
+  { [ "$n" = 1 ] && [ "$m" = 1 ]; } || bad "visits.js sets an href on $n lines, $m of them the sign-up link's visit id (exactly one)"
   vread="$(printf '%s\n' "$vcode" | grep -n -i -E "cookie|\.value|['\"](keydown|keyup|keypress|input|change|beforeinput|paste|copy|cut|submit)['\"]|clipboard|FormData|innerHTML|outerHTML|innerText|getSelection|eval[[:space:]]*\(|new Function")"
   [ -z "$vread" ] || { bad "visits.js reads what it promised not to:"; printf '%s\n' "$vread"; }
 fi
-others="$(find "$DOCS" -name '*.js' ! -name 'visits.js' -print0 | xargs -0 grep -n -E "(^|[^A-Za-z0-9_\$.])fetch[[:space:]]*\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource" | sed "s|^$ROOT/||")"
+others="$(find "$DOCS" -name '*.js' ! -name 'visits.js' -print0 | xargs -0 grep -n -E "fetch[[:space:]]*\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource" | sed "s|^$ROOT/||")"
 [ -z "$others" ] || { bad "a script other than visits.js reaches the network:"; printf '%s\n' "$others"; }
+# every script a page runs is a file under docs/assets/ that these rules read: no page holds a script of its own
+inline="$(while IFS= read -r page; do strip_html_comments "$page" | grep -n -i -E "<script" | grep -v -E '<script src="/assets/[a-z]+\.js"></script>' | sed "s|^|$(rel "$page"):|"; done < <(pages))"
+[ -z "$inline" ] || { bad "a page holds a script of its own (every script is a file under docs/assets/):"; printf '%s\n' "$inline"; }
 [ "$fail" -eq "$fail_before" ] && ok "visits.js: on every page after site.js; one post to COLLECT_URL without credentials; no cookie, nothing typed read"
 
 if [ "$fail" -eq 0 ]; then echo "check_site: green"; else echo "check_site: RED"; fi
