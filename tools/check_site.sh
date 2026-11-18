@@ -28,6 +28,10 @@
 #      EventSource, import( or form submit, and no message listener. Its one postMessage tells CONFIG.APP_ORIGIN, and
 #      only that origin, that the framed window closed. (What it loads are the site's own pictures, rule 2, and the
 #      one frame, rule 9.)
+#  11. The visit script (docs/assets/visits.js) is on every page, after site.js, and keeps its promises: it posts to
+#      one address (COLLECT_URL, exactly https://app.civiumcre.com/api/site/collect) with one fetch( that omits
+#      credentials, and reaches the network no other way; it sets and reads no cookie; it reads nothing a person types
+#      (no .value, no key or input listener, no form, no clipboard); and no other script on the site reaches the network.
 # Exits 1 on any failure. Uses bash 3.2, grep, sed, awk and cmp only.
 set -u
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -294,6 +298,33 @@ n="$(printf '%s\n' "$code" | grep -c 'postMessage')"
 m="$(printf '%s\n' "$code" | grep -c -F "window.parent.postMessage({ civium: 'gs-close' }, CONFIG.APP_ORIGIN)")"
 { [ "$n" = 1 ] && [ "$m" = 1 ]; } || bad "site.js names postMessage on $n lines, $m of them the close told to CONFIG.APP_ORIGIN (exactly one, never '*')"
 [ "$fail" -eq "$fail_before" ] && ok "site.js asks the network for nothing; its one postMessage tells CONFIG.APP_ORIGIN the framed window closed"
+
+# 11. The visit script.
+fail_before=$fail
+VJS="$DOCS/assets/visits.js"
+if [ ! -f "$VJS" ]; then bad "docs/assets/visits.js is missing"
+else
+  vcode="$(sed -E 's#(^|[[:space:]])//.*$#\1#' "$VJS")"   # visits.js without its // comments
+  while IFS= read -r page; do
+    n="$(strip_html_comments "$page" | grep -c -F '<script src="/assets/visits.js"></script>')"
+    after="$(strip_html_comments "$page" | grep -n -F -e '<script src="/assets/site.js"></script>' -e '<script src="/assets/visits.js"></script>' | sed -E 's/^[0-9]+:<script src="\/assets\/([a-z]+)\.js"><\/script>$/\1/' | tr '\n' ' ')"
+    [ "$n" = 1 ] || bad "$(rel "$page") loads visits.js $n times (exactly once)"
+    [ "$after" = "site visits " ] || bad "$(rel "$page") does not load site.js and then visits.js"
+  done < <(pages)
+  n="$(printf '%s\n' "$vcode" | grep -c -E "(^|[^A-Za-z0-9_\$.])fetch[[:space:]]*\(")"
+  m="$(printf '%s\n' "$vcode" | grep -c -F "fetch(COLLECT_URL, { method: 'POST', body, keepalive: true, credentials: 'omit', mode: 'no-cors',")"
+  { [ "$n" = 1 ] && [ "$m" = 1 ]; } || bad "visits.js calls fetch( on $n lines, $m of them the one post to COLLECT_URL without credentials (exactly one)"
+  [ "$(grep -c -x "  const COLLECT_URL = 'https://app.civiumcre.com/api/site/collect';" "$VJS")" = 1 ] \
+    || bad "visits.js's COLLECT_URL is not exactly https://app.civiumcre.com/api/site/collect"
+  [ "$(printf '%s\n' "$vcode" | grep -c 'COLLECT_URL')" = 2 ] || bad "visits.js names COLLECT_URL other than where it is set and where it is posted to"
+  vnet="$(printf '%s\n' "$vcode" | grep -n -E "(^|[^A-Za-z0-9_\$.])(import|importScripts)[[:space:]]*\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource|RTCPeerConnection|serviceWorker|\.submit[[:space:]]*\(|postMessage|['\"]message['\"]|onmessage|new Image|\.src[[:space:]]*=")"
+  [ -z "$vnet" ] || { bad "visits.js reaches the network another way:"; printf '%s\n' "$vnet"; }
+  vread="$(printf '%s\n' "$vcode" | grep -n -i -E "cookie|\.value|['\"](keydown|keyup|keypress|input|change|beforeinput|paste|copy|cut|submit)['\"]|clipboard|FormData|innerHTML|outerHTML|innerText|getSelection|eval[[:space:]]*\(|new Function")"
+  [ -z "$vread" ] || { bad "visits.js reads what it promised not to:"; printf '%s\n' "$vread"; }
+fi
+others="$(find "$DOCS" -name '*.js' ! -name 'visits.js' -print0 | xargs -0 grep -n -E "(^|[^A-Za-z0-9_\$.])fetch[[:space:]]*\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource" | sed "s|^$ROOT/||")"
+[ -z "$others" ] || { bad "a script other than visits.js reaches the network:"; printf '%s\n' "$others"; }
+[ "$fail" -eq "$fail_before" ] && ok "visits.js: on every page after site.js; one post to COLLECT_URL without credentials; no cookie, nothing typed read"
 
 if [ "$fail" -eq 0 ]; then echo "check_site: green"; else echo "check_site: RED"; fi
 exit $(( fail > 0 ))
