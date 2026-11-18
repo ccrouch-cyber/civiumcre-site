@@ -14,6 +14,11 @@ at app.civiumcre.com; nothing confidential belongs here.
   view (empty until there is one; the booking buttons write an email until then).
 - `docs/assets/site.css` holds every colour, shadow and font stack as a token;
   `docs/assets/coastal.css` holds the pages' and the window's styles.
+- `docs/assets/visits.js` is the visit script, on every page after `site.js`. It tells the app which
+  pages are opened, where a visit came from, what is pressed, how far down a page and for how long,
+  so the house can see what is read. It posts to one address and asks nothing back. It sets no
+  cookie, reads nothing a person types, records no screen and sends no name or internet address; a
+  browser that asks not to be tracked is given no id that outlasts the visit.
 - `docs/assets/stats.js` holds the homepage's two proof numbers. `.github/workflows/stats.yml`
   and `tools/write_stats.cjs` rewrite it once the app publishes them; until then the page
   reads "Not yet measured".
@@ -23,7 +28,8 @@ at app.civiumcre.com; nothing confidential belongs here.
 `bash tools/check_site.sh` must end `check_site: green` before anything is published. It
 holds the site's rules: every link and picture resolves, every colour is a token, nothing
 loads from another host but the one configured scheduling page, the Get started window is
-built once, and the script asks the network for nothing.
+built once, `site.js` asks the network for nothing, and `visits.js` keeps its promises (one
+post, no cookie, nothing typed read).
 
 ## Where the pages come from
 
