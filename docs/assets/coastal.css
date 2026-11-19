@@ -319,24 +319,17 @@ html.gs-root, html.gs-root body { background: transparent; }
 .gs-group { display: flex; flex-direction: column; gap: 14px; }
 .gs-row { display: flex; flex-wrap: wrap; gap: 14px; }
 .gs-panel { position: relative; overflow: hidden; display: flex; flex-direction: column; flex: 1 1 0; min-width: min(100%,240px); min-height: 262px; border-radius: 6px; color: var(--coastal-ondeep); transition: flex-grow .6s var(--coastal-ease-start); }
-.gs-row--account .gs-panel { min-height: 330px; }
 .gs-panel--demo { background: var(--coastal-start-demo-flat); }
 .gs-panel--meet { background: var(--coastal-start-meet-flat); }
-.gs-panel--free { background: var(--coastal-start-free-flat); }
-.gs-panel--trial { background: var(--coastal-start-trial-flat); }
 .gs-panel-ground, .gs-panel-grain { position: absolute; inset: 0; }
 .gs-panel--demo .gs-panel-ground { background: url(start/mottle-a.webp) center / cover no-repeat, var(--coastal-start-demo); }
 .gs-panel--meet .gs-panel-ground { background: url(start/mottle-d.webp) center / cover no-repeat, var(--coastal-start-meet); }
-.gs-panel--free .gs-panel-ground { background: url(start/mottle-b.webp) center / cover no-repeat, var(--coastal-start-free); }
-.gs-panel--trial .gs-panel-ground { background: url(start/mottle-c.webp) center / cover no-repeat, var(--coastal-start-trial); }
 /* The grain: the one-pixel-per-point tile first, for a browser without image-set(); then the tile for the screen. */
 .gs-panel-grain { background-image: url(start/grain-240.webp); background-image: image-set(url(start/grain-240.webp) 1x, url(start/grain-480.webp) 2x); background-size: 240px 240px; }
 .gs-panel-text { position: relative; z-index: 2; flex: 1; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; max-width: 310px; padding: 26px 28px; }
 .gs-panel--meet .gs-panel-text { max-width: 340px; }
 .gs-panel-title { font: 600 clamp(26px,2.1vw,32px)/1.12 var(--coastal-serif); margin: 0; }
 .gs-panel-line { font: 400 15.5px/1.55 var(--coastal-sans); color: var(--coastal-ondeep2); margin: 0; text-wrap: pretty; }
-.gs-row--account .gs-panel-text { gap: 8px; }
-.gs-row--account .gs-panel-line { font-size: 16px; line-height: 1.45; text-wrap: wrap; }
 .gs-list { list-style: none; margin: 12px 0 22px; padding: 0; display: flex; flex-direction: column; gap: 10px; font: 400 14.5px/1.45 var(--coastal-sans); color: var(--coastal-ondeep3); }
 .gs-list li { display: flex; align-items: center; gap: 12px; }
 .gs-list li::before { content: ''; flex: none; width: 12px; height: 1px; background: var(--coastal-dash); }

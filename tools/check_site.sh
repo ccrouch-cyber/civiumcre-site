@@ -6,8 +6,8 @@
 #      or data:. So does every address in a page's srcset and every url() in the site's stylesheets. site.js runs on
 #      every page, so the paths it sets must be root-relative. No ".." or "." path segments.
 #   3. The configuration block opens site.js, line by line: its keys in order, its values single-quoted, nothing
-#      after a value but a comment. The four doors into the app (demo, free, trial, Civium) are https on
-#      app.civiumcre.com, and each Start address names its own plan; SIGN_IN_URL is the same host or empty;
+#      after a value but a comment. The one door into the app (the demo) is https on app.civiumcre.com; no
+#      address leads to the app's sign-up; SIGN_IN_URL is the same host or empty;
 #      APP_ORIGIN is exactly https://app.civiumcre.com; PRICING_URL is a path to a page under docs/; TALK_MAIL is a
 #      mailto: address; SCHEDULER_URL is empty or one https address.
 #   4. No color literal outside site.css's single token block: no hex, rgb(), hsl(), hwb(), lab(), lch(), oklab(),
@@ -17,9 +17,9 @@
 #   5. Exactly one <h1> per page.
 #   6. No host other than civiumcre.com in any text file under docs/ (the SVG and sitemap namespace names excepted),
 #      and no protocol-relative URL. One exception: the scheduler's address, on SCHEDULER_URL's own line of site.js.
-#   7. The buttons. Every [data-cta] is a link to /start/. Pricing has one Start free, one Start the trial and one
-#      Start Civium (data-go), Book a call and the team line (data-book custom, team), and the billing toggle with
-#      Monthly pressed. Every [data-book] link carries TALK_MAIL, the same address the configuration holds.
+#   7. The buttons. Every [data-cta] is a link to /start/. No page holds a link into the app's sign-up (no data-go). Pricing has
+#      Book a call on each card (data-book demo twice, custom once), the team line (data-book team), and the
+#      billing toggle with Monthly pressed. Every [data-book] link carries TALK_MAIL, the same address the configuration holds.
 #   8. The Get started window is built once: site.js makes one <dialog>, no page holds the window's markup, and only
 #      docs/start/index.html is the window's own page ([data-gs-page]).
 #   9. Frames. No page and no template in site.js holds a frame, an object or an embed. site.js makes at most one
@@ -136,9 +136,6 @@ done <<BLOCK
 ^const CONFIG = \{\$
 ^  CTA_LABEL: '[^']+',$end
 ^  DEMO_URL: '[^']*',$end
-^  FREE_URL: '[^']*',$end
-^  TRIAL_URL: '[^']*',$end
-^  CIVIUM_URL: '[^']*',$end
 ^  SIGN_IN_URL: '[^']*',$end
 ^  SIGN_IN_LABEL: '[^']+',$end
 ^  PRICING_URL: '[^']*',$end
@@ -155,26 +152,21 @@ if [ "$cfg_ok" -eq 1 ]; then
   val="$(config_value 3)"
   if printf '%s' "$val" | grep -q -E "$app/[^[:space:]]*\$"; then ok "DEMO_URL is $val"
   else bad "DEMO_URL must be https on app.civiumcre.com, not '$val'"; fi
-  for trio in 4:FREE_URL:free 5:TRIAL_URL:trial 6:CIVIUM_URL:civium; do
-    line="${trio%%:*}"; rest="${trio#*:}"; key="${rest%%:*}"; plan="${rest#*:}"; val="$(config_value "$line")"
-    if printf '%s' "$val" | grep -q -E "$app/[^[:space:]]*[?&]plan=$plan\$"; then ok "$key is $val"
-    else bad "$key must be https on app.civiumcre.com and end in plan=$plan, not '$val'"; fi
-  done
-  val="$(config_value 7)"
+  val="$(config_value 4)"
   if [ -z "$val" ]; then ok "SIGN_IN_URL is empty (the sign-in links are not rendered)"
   elif printf '%s' "$val" | grep -q -E "$app(/[^[:space:]]*)?\$"; then ok "SIGN_IN_URL is $val"
   else bad "SIGN_IN_URL must be empty or https on app.civiumcre.com, not '$val'"; fi
-  val="$(config_value 9)"
+  val="$(config_value 6)"
   if [ "${val#/}" != "$val" ] && [ "${val#//}" = "$val" ] && [ -n "$(resolve "$DOCS/index.html" "$val")" ]; then ok "PRICING_URL resolves: $val"
   else bad "PRICING_URL must be a path from / to a page under docs/, not '$val'"; fi
-  val="$(config_value 10)"
+  val="$(config_value 7)"
   if [ "$val" = "https://app.civiumcre.com" ]; then ok "APP_ORIGIN is $val"
   else bad "APP_ORIGIN must be exactly https://app.civiumcre.com (an origin: no path, no slash), not '$val'"; fi
-  sched="$(config_value 11)"
+  sched="$(config_value 8)"
   if [ -z "$sched" ]; then ok "SCHEDULER_URL is empty (the booking buttons write to TALK_MAIL)"
   elif printf '%s' "$sched" | grep -q -E '^https://[a-z0-9]([a-z0-9.-]*[a-z0-9])?(/[^[:space:]@\\]*)?$'; then ok "SCHEDULER_URL is $sched (the one outside host the site names)"
   else bad "SCHEDULER_URL must be empty or one https address (lower-case host, no user, no port), not '$sched'"; fi
-  talk="$(config_value 12)"
+  talk="$(config_value 9)"
   if printf '%s' "$talk" | grep -q -E '^mailto:[^@[:space:]?]+@[^@[:space:]?]+\.[a-z]+$'; then ok "TALK_MAIL is $talk"
   else bad "TALK_MAIL must be a mailto: address, not '$talk'"; fi
 fi
@@ -258,15 +250,21 @@ while IFS= read -r page; do
     esac
   done < <(tags "$page")
 done < <(pages)
-for want in 'data-go="free"' 'data-go="trial"' 'data-go="civium"' 'data-book="custom"' 'data-book="team"' \
-            'data-billing="monthly" aria-pressed="true"' 'data-billing="yearly" aria-pressed="false"'; do
+for pair in '2:data-book="demo"' '1:data-book="custom"' '1:data-book="team"' \
+            '1:data-billing="monthly" aria-pressed="true"' '1:data-billing="yearly" aria-pressed="false"'; do
+  many="${pair%%:*}"; want="${pair#*:}"
   n="$(tags "$PRICING" | grep -c -F "$want")"
-  [ "$n" = 1 ] || bad "pricing: $n tags carry $want (exactly one)"
+  [ "$n" = "$many" ] || bad "pricing: $n tags carry $want (exactly $many)"
 done
-for key in DEMO_URL FREE_URL TRIAL_URL CIVIUM_URL SIGN_IN_URL PRICING_URL TALK_MAIL; do
+while IFS= read -r page; do
+  n="$(tags "$page" | grep -c -F 'data-go=')"
+  [ "$n" = 0 ] || bad "$(rel "$page"): $n tags carry data-go (no page links into the app's sign-up)"
+done < <(pages)
+grep -q -E "signup|plan=" "$JS" && bad "site.js names the app's sign-up (no address leads there)"
+for key in DEMO_URL SIGN_IN_URL PRICING_URL TALK_MAIL; do
   grep -q "CONFIG\.$key" "$JS" || bad "site.js never reads CONFIG.$key"
 done
-[ "$fail" -eq "$fail_before" ] && ok "the buttons: every [data-cta] links to /start/, Pricing has its three Start buttons, two booking links and the toggle, every [data-book] carries TALK_MAIL"
+[ "$fail" -eq "$fail_before" ] && ok "the buttons: every [data-cta] links to /start/, Pricing has its four booking links and the toggle, no page links into sign-up, every [data-book] carries TALK_MAIL"
 
 # 8. The window is built once.
 fail_before=$fail

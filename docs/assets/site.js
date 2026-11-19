@@ -1,9 +1,6 @@
 const CONFIG = {
   CTA_LABEL: 'Get started',     // the words on every button that opens the Get started window
   DEMO_URL: 'https://app.civiumcre.com/#demo',                 // Open the demo
-  FREE_URL: 'https://app.civiumcre.com/signup?plan=free',      // Start free
-  TRIAL_URL: 'https://app.civiumcre.com/signup?plan=trial',    // Start the trial
-  CIVIUM_URL: 'https://app.civiumcre.com/signup?plan=civium',  // Start Civium, on Pricing; Yearly adds interval=year
   SIGN_IN_URL: 'https://app.civiumcre.com/',                   // the app's sign-in; '' = the link is not rendered
   SIGN_IN_LABEL: 'Client portal',                              // the sign-in link's words, one string
   PRICING_URL: '/pricing/',                                    // See pricing and Ready to buy, inside the window
@@ -52,26 +49,22 @@ const CONFIG = {
   const params = new URLSearchParams(location.search);
   const startPage = $('[data-gs-page]');
   const embed = !!startPage && params.get('embed') === '1';
-  const GO = { demo: CONFIG.DEMO_URL, free: CONFIG.FREE_URL, trial: CONFIG.TRIAL_URL, signin: CONFIG.SIGN_IN_URL, pricing: CONFIG.PRICING_URL };
+  const GO = { demo: CONFIG.DEMO_URL, signin: CONFIG.SIGN_IN_URL, pricing: CONFIG.PRICING_URL };
   const PREVIEW = {   // the app previews: the design's sample app at 1280x800, the screen the design frames in each panel
-    demo: '<div class="gs-preview" aria-hidden="true"><img src="/assets/start/demo-1280.webp" srcset="/assets/start/demo-1280.webp 1280w, /assets/start/demo-1920.webp 1920w" sizes="704px" width="704" height="440" alt="" loading="lazy"></div>',
-    free: '<div class="gs-preview" aria-hidden="true"><img src="/assets/start/free-1280.webp" srcset="/assets/start/free-1280.webp 1280w, /assets/start/free-1920.webp 1920w" sizes="704px" width="704" height="440" alt="" loading="lazy"></div>',
-    trial: '<div class="gs-preview" aria-hidden="true"><img src="/assets/start/trial-1280.webp" srcset="/assets/start/trial-1280.webp 1280w, /assets/start/trial-1920.webp 1920w" sizes="704px" width="704" height="440" alt="" loading="lazy"></div>'
+    demo: '<div class="gs-preview" aria-hidden="true"><img src="/assets/start/demo-1280.webp" srcset="/assets/start/demo-1280.webp 1280w, /assets/start/demo-1920.webp 1920w" sizes="704px" width="704" height="440" alt="" loading="lazy"></div>'
   };
-  const PANELS = [   // the four ways in: [kind, title, the line under it, the list, the button's words]
+  const PANELS = [   // the two ways in: [kind, title, the line under it, the list, the button's words]
     ['demo', 'Civium Demo', 'Click around one of our deals. See how we underwrite.', [], 'Open the demo'],
-    ['meet', 'Book a meeting', 'A 30-minute call with our team. Talk about your deals and your workflow with us. See how we can help.', [], 'Talk with our team'],
-    ['free', 'Civium Free', 'Start with one deal', ['No card required', 'One deal of your own', 'Comps where Civium already has them'], 'Start free'],
-    ['trial', 'Civium Trial', 'Start with everything', ['Card required', 'Up to five deals over 14 days', 'Sharing and your relationship book', 'Then Civium, at $1,500 a month'], 'Start the trial']
+    ['meet', 'Book a call', 'A 30-minute call with our team. Talk about your deals and your workflow with us. See how we can help.', [], 'Talk with our team']
   ];
   const TOPICS = {   // the booking view's words, by topic: [the line over the title, the title, the line under it]
     demo: ['Talk with our team', 'Pick a time with Caden.', '30 minutes on a video call. Bring a deal if you have one.'],
     team: ['Teams', 'Talk to Caden about your team.', '30 minutes on a video call about seats, setup and pricing for your team.'],
-    custom: ['Civium Custom', 'Civium Custom starts with a call.', 'Civium Custom is Civium plus monthly customizations from your own list, and meetings with Caden. It is priced to what you need. Bring the list.']
+    custom: ['Civium × Your firm', 'Civium × Your firm starts with a call.', 'It is Civium plus monthly customizations from your own list, and meetings with Caden. It is priced to what you need. Bring the list.']
   };
   const WORDS = {   // the rest of the window's words
     heading: 'Get started', lead: 'Get familiar with Civium at your pace.', buy: 'Ready to buy →',
-    open: 'No account needed', withAccount: 'With an account',
+    open: 'No account needed',
     account: 'Already have an account?', signin: 'Client portal →', pricing: 'See pricing →',
     back: '← All the ways to start', meta: ['30 minutes', 'Video call']
   };
@@ -94,8 +87,8 @@ const CONFIG = {
       + '<div class="gs-panel-text"><h3 class="gs-panel-title">' + title + '</h3><p class="gs-panel-line">' + line + '</p>'
       + (items.length ? '<ul class="gs-list">' + items.map(t => '<li>' + t + '</li>').join('') + '</ul>' : '')
       + button(kind, words) + '</div><div class="gs-panel-wash"></div></div>';
-    const group = (eyebrow, panels, account) => '<div class="gs-group"><span class="gs-eyebrow">' + eyebrow + '</span>'
-      + '<div class="gs-row' + (account ? ' gs-row--account' : '') + '">' + panels.map(pane).join('') + '</div></div>';
+    const group = (eyebrow, panels) => '<div class="gs-group"><span class="gs-eyebrow">' + eyebrow + '</span>'
+      + '<div class="gs-row">' + panels.map(pane).join('') + '</div></div>';
     d.innerHTML = '<div class="gs-card">'
       + '<div class="gs-side"><img class="gs-side-photo" src="/assets/photos/home-close-galleria.jpg" width="1600" height="2400" alt="">'
       + '<div class="gs-side-shade"></div><div class="gs-side-in"><span class="gs-wordmark">CIVIUM</span>'
@@ -104,7 +97,7 @@ const CONFIG = {
       + '<div class="gs-intro gs-intro--book" data-gs-view="book" hidden><span class="gs-eyebrow gs-eyebrow--side" data-gs-topic="eyebrow"></span>'
       + '<h2 class="gs-title" id="gs-book-title" tabindex="-1" data-gs-topic="title"></h2></div></div></div>'
       + '<div class="gs-main"><button type="button" class="gs-close" aria-label="Close" data-gs-close>×</button>'
-      + '<div class="gs-choose" data-gs-view="choose">' + group(WORDS.open, PANELS.slice(0, 2)) + group(WORDS.withAccount, PANELS.slice(2), true) + '</div>'
+      + '<div class="gs-choose" data-gs-view="choose">' + group(WORDS.open, PANELS) + '</div>'
       + '<div class="gs-foot" data-gs-view="choose"><span data-gs-signin>' + WORDS.account + ' <a class="gs-foot-link" data-gs-go="signin">' + WORDS.signin + '</a></span>'
       + '<a class="gs-foot-link" data-gs-go="pricing">' + WORDS.pricing + '</a></div>'
       + '<div class="gs-book" data-gs-view="book" hidden><button type="button" class="gs-back" data-gs-back>' + WORDS.back + '</button>'
@@ -207,7 +200,6 @@ const CONFIG = {
     a.setAttribute('aria-haspopup', 'dialog');
     a.addEventListener('click', e => { if (plain(e)) return; e.preventDefault(); openStart('book', a.dataset.book); });
   });
-  $$('[data-go]').forEach(a => { a.href = GO[a.dataset.go]; });   // Pricing's Start free and Start the trial
   if (startPage) {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStart(); });
     openStart(params.get('view'), params.get('topic'));
@@ -242,18 +234,13 @@ const CONFIG = {
   }
 
   // Pricing: the Monthly / Yearly toggle on the Civium card (two buttons with aria-pressed; Monthly is the default).
-  // It swaps the price, its unit and the line under it, and Start Civium's address: Yearly adds interval=year.
+  // It swaps the price, its unit and the line under it.
   const billing = $$('[data-billing]');
   const setBilling = mode => {
     billing.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.billing === mode)));
     $$('[data-monthly]').forEach(el => { el.textContent = el.dataset[mode]; });
-    $$('[data-go="civium"]').forEach(a => {
-      const u = new URL(CONFIG.CIVIUM_URL);
-      if (mode === 'yearly') u.searchParams.set('interval', 'year');
-      a.href = u.href;
-    });
   };
-  if (billing.length || $('[data-go="civium"]')) setBilling('monthly');
+  if (billing.length) setBilling('monthly');
   billing.forEach(b => b.addEventListener('click', () => setBilling(b.dataset.billing)));
 
   // The value bridge: rows 520ms apart, each fading and rising 10px over 600ms; each bar grows over 900ms while
